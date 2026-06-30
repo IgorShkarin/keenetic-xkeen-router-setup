@@ -1,0 +1,48 @@
+{
+  "outbounds": [
+    {
+      "tag": "vless-reality",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "REPLACE_WITH_SERVER_IP_OR_HOST",
+            "port": 443,
+            "users": [
+              {
+                "id": "REPLACE_WITH_UUID",
+                "flow": "xtls-rprx-vision",
+                "encryption": "none",
+                "level": 0
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "fingerprint": "firefox",
+          "serverName": "REPLACE_WITH_REALITY_SERVER_NAME",
+          "publicKey": "REPLACE_WITH_PUBLIC_KEY",
+          "shortId": "REPLACE_WITH_SHORT_ID",
+          "spiderX": "/"
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
+    }
+  ]
+}

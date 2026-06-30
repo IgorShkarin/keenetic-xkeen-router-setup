@@ -1,0 +1,43 @@
+{
+  "routing": {
+    "rules": [
+      {
+        "inboundTag": ["redirect", "tproxy"],
+        "outboundTag": "block",
+        "network": "udp",
+        "port": "135,137,138,139"
+      },
+      {
+        "inboundTag": ["redirect", "tproxy"],
+        "outboundTag": "block",
+        "domain": [
+          "google-analytics",
+          "analytics.yandex",
+          "appcenter.ms",
+          "app-measurement.com",
+          "firebase.io",
+          "crashlytics.com"
+        ]
+      },
+      {
+        "inboundTag": ["redirect", "tproxy"],
+        "outboundTag": "vless-reality",
+        "domain": [
+          "ext:geosite_zkeen.dat:domains",
+          "ext:geosite_zkeen.dat:other",
+          "ext:geosite_zkeen.dat:youtube"
+        ]
+      },
+      {
+        "inboundTag": ["redirect", "tproxy"],
+        "outboundTag": "direct",
+        "protocol": ["bittorrent"]
+      },
+      {
+        "inboundTag": ["redirect", "tproxy"],
+        "outboundTag": "direct",
+        "network": "tcp,udp"
+      }
+    ]
+  }
+}

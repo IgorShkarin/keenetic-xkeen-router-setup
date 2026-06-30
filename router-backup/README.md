@@ -81,7 +81,9 @@ Replace the template outbound file with your own private `04_outbounds.json` onl
 
 ## Restore
 
-Copy the working files to the router:
+Copy the working files to the router. If Entware Dropbear does not provide
+`/opt/libexec/sftp-server`, `scp` may fail; use SSH, the router terminal, or add
+an SFTP server first.
 
 ```sh
 scp 03_inbounds.json root@192.168.1.1:/opt/etc/xray/configs/03_inbounds.json
@@ -100,6 +102,12 @@ If SSH needs binding from macOS because of local routing issues:
 
 ```sh
 ssh -b <mac_wifi_ip> root@192.168.1.1
+```
+
+For Entware Dropbear key auth, put public keys here:
+
+```text
+/opt/etc/dropbear/authorized_keys
 ```
 
 ## Follow-up

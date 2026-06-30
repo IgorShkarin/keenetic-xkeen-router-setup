@@ -2,13 +2,19 @@
   "routing": {
     "rules": [
       {
-        "inboundTag": ["redirect", "tproxy"],
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
         "outboundTag": "block",
         "network": "udp",
         "port": "135,137,138,139"
       },
       {
-        "inboundTag": ["redirect", "tproxy"],
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
         "outboundTag": "block",
         "domain": [
           "google-analytics",
@@ -20,7 +26,10 @@
         ]
       },
       {
-        "inboundTag": ["redirect", "tproxy"],
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
         "outboundTag": "vless-reality",
         "domain": [
           "ext:geosite_zkeen.dat:domains",
@@ -29,12 +38,40 @@
         ]
       },
       {
-        "inboundTag": ["redirect", "tproxy"],
-        "outboundTag": "direct",
-        "protocol": ["bittorrent"]
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
+        "outboundTag": "vless-reality",
+        "domain": [
+          "domain:kino.pub",
+          "domain:service-kp.com",
+          "domain:pushbr.com",
+          "domain:gcdn.co",
+          "domain:wotblitz.com",
+          "domain:wargaming.net",
+          "domain:wargaming.com",
+          "domain:wgcdn.co",
+          "domain:lesta.ru",
+          "domain:lesta.games",
+          "domain:tanksblitz.ru"
+        ]
       },
       {
-        "inboundTag": ["redirect", "tproxy"],
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
+        "outboundTag": "direct",
+        "protocol": [
+          "bittorrent"
+        ]
+      },
+      {
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
         "outboundTag": "direct",
         "network": "tcp,udp"
       }

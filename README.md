@@ -171,7 +171,9 @@ Do not publish a real `04_outbounds.json`: it contains VPN credentials.
 
 ## Restore Example
 
-Copy configs to the router:
+Copy configs to the router. On some Entware installations, `scp` may fail if
+`/opt/libexec/sftp-server` is absent; in that case use SSH, the router terminal,
+or install an SFTP server first.
 
 ```sh
 scp 03_inbounds.json root@192.168.1.1:/opt/etc/xray/configs/03_inbounds.json
@@ -191,6 +193,14 @@ If macOS has local routing issues, bind SSH to the current Wi-Fi IP:
 ```sh
 ssh -b <mac_wifi_ip> root@192.168.1.1
 ```
+
+For Entware Dropbear, SSH public keys are read from:
+
+```text
+/opt/etc/dropbear/authorized_keys
+```
+
+Adding keys only to `/opt/root/.ssh/authorized_keys` may not be enough.
 
 ## Security Notes
 

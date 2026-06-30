@@ -9,6 +9,7 @@ Working state captured after YouTube started working through XKeen/Xray on a TV 
 - XKeen: 2.0 Stable
 - Xray: 26.6.27
 - Mode after start: Hybrid
+- VPN config source: BlancVPN-generated Xray/VLESS Reality config
 
 ## Working actions performed
 
@@ -89,3 +90,7 @@ ssh -b <mac_wifi_ip> root@192.168.1.1
 - Assign target TV or other clients to the `xkeen` policy.
 - Change default Entware root password from `keenetic`.
 - After a router reboot, verify `xkeen -status`.
+
+## Keywords
+
+Keenetic, Netcraze, Hopper, NC-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, router VPN, KeeneticOS, OpenWrt alternative.

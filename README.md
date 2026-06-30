@@ -13,8 +13,11 @@ This repository is a safe public checklist for people who want to run a selectiv
 - XKeen
 - Xray
 - VLESS Reality
+- BlancVPN-generated Xray configs
 - GeoSite / GeoIP routing
 - selective routing for services such as YouTube and other blocked domains
+
+This is **not** an OpenWrt flashing guide. It is a KeeneticOS + Entware setup, useful when you want an OpenWrt-like router VPN result without replacing the router firmware.
 
 It does **not** contain real VPN credentials.
 
@@ -151,4 +154,4 @@ ssh -b <mac_wifi_ip> root@192.168.1.1
 
 ## Keywords
 
-Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, YouTube, Smart TV, router VPN, KeeneticOS.
+Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, YouTube, Smart TV, router VPN, KeeneticOS, OpenWrt alternative.

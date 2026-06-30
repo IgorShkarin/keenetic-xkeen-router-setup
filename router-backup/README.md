@@ -1,6 +1,6 @@
 # Netcraze/Keenetic Hopper NC-3811 XKeen Backup
 
-Working state captured after YouTube on LG started working through XKeen/Xray.
+Working state captured after YouTube started working through XKeen/Xray on a TV connected to the router.
 
 ## Router
 
@@ -86,6 +86,6 @@ ssh -b <mac_wifi_ip> root@192.168.1.1
 ## Follow-up
 
 - Create Keenetic internet policy named exactly `xkeen` if per-device routing is needed.
-- Assign LG TV to the `xkeen` policy.
+- Assign target TV or other clients to the `xkeen` policy.
 - Change default Entware root password from `keenetic`.
 - After a router reboot, verify `xkeen -status`.

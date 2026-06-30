@@ -2,6 +2,12 @@
 
 Working state captured after YouTube started working through XKeen/Xray on a TV connected to the router.
 
+## Коротко
+
+Это санитизированная резервная копия рабочей настройки **XKeen + Xray + VLESS Reality** для **Netcraze / Keenetic Hopper NC-3811**.
+
+Цель: сохранить структуру и безопасные примеры конфигов, чтобы можно было восстановить настройку роутерного VPN/proxy для YouTube, Smart TV и других сервисов без публикации приватных VPN-ключей.
+
 ## Router
 
 - Model: Netcraze/Keenetic Hopper NC-3811
@@ -61,6 +67,18 @@ router-backup/private/xkeen-configs/
 
 This folder is ignored by Git.
 
+## Public files
+
+The public folder contains only safe examples:
+
+```text
+router-backup/public/xkeen-configs/03_inbounds.json
+router-backup/public/xkeen-configs/04_outbounds.template.json
+router-backup/public/xkeen-configs/05_routing.fixed-no-v2fly.json
+```
+
+Replace the template outbound file with your own private `04_outbounds.json` only on the router or in a private backup.
+
 ## Restore
 
 Copy the working files to the router:
@@ -93,4 +111,4 @@ ssh -b <mac_wifi_ip> root@192.168.1.1
 
 ## Keywords
 
-Keenetic, Netcraze, Hopper, NC-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, router VPN, KeeneticOS, OpenWrt alternative.
+Keenetic, Netcraze, Hopper, NC-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, router VPN, KeeneticOS, OpenWrt alternative, YouTube на Smart TV, VPN на роутере.

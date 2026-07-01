@@ -1,4 +1,10 @@
 router-backup/private/
+artifacts/incidents/*
+artifacts/routing-candidates/*
+artifacts/release-checks/*
+!artifacts/incidents/.gitkeep
+!artifacts/routing-candidates/.gitkeep
+!artifacts/release-checks/.gitkeep
 *.log
 vpn_logs/
 __pycache__/

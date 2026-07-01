@@ -127,6 +127,47 @@ Private real configs are intentionally ignored:
 router-backup/private/
 ```
 
+## Codex Workflow
+
+This repository also keeps a small local Codex workflow so future debugging does
+not start from zero every time.
+
+```text
+.codex/project-skills/
+  keenetic-repo-triage/
+  xray-routing-triage/
+  public-config-sanitizer/
+  macos-vpn-diagnostician/
+docs/
+  local-codex-workflow.md
+  open-source-tooling-ru.md
+tools/
+  analyze_access_log.py
+  sanitize_public_release.sh
+  validate_xray_bundle.sh
+  deploy_router.sh
+artifacts/
+  incidents/
+  routing-candidates/
+  release-checks/
+```
+
+The intended workflow is:
+
+1. describe the symptom and the target device;
+2. collect facts cheaply with a triage skill or junior agent;
+3. make the smallest routing/config change;
+4. validate JSON and restart XKeen;
+5. confirm the service on the real target device;
+6. run public config sanitization before any public commit.
+
+See [`docs/local-codex-workflow.md`](docs/local-codex-workflow.md) for the
+human-facing process.
+
+Router deployment tooling is dry-run by default. It expects private configs
+under `router-backup/private/xkeen-configs/` and requires `--apply` before it
+uploads anything or restarts XKeen.
+
 ## Tested Router
 
 - Model: Netcraze / Keenetic Hopper NC-3811

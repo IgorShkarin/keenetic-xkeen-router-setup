@@ -66,7 +66,12 @@
           "domain:telegram.me",
           "domain:telegram.dog",
           "domain:telegra.ph",
-          "domain:tdesktop.com"
+          "domain:tdesktop.com",
+          "domain:chatgpt.com",
+          "domain:openai.com",
+          "domain:oaistatic.com",
+          "domain:oaiusercontent.com",
+          "domain:statsigapi.net"
         ]
       },
       {

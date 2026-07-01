@@ -1,12 +1,14 @@
 # Netcraze/Keenetic Hopper NC-3811 XKeen Backup
 
-Working state captured after YouTube started working through XKeen/Xray on a TV connected to the router.
+Working state captured after YouTube, Kino.pub, WOT Blitz, Telegram, Claude,
+and ChatGPT mobile started working through XKeen/Xray on devices connected to
+the router.
 
 ## Коротко
 
 Это санитизированная резервная копия рабочей настройки **XKeen + Xray + VLESS Reality** для **Netcraze / Keenetic Hopper NC-3811**.
 
-Цель: сохранить структуру и безопасные примеры конфигов, чтобы можно было восстановить настройку роутерного VPN/proxy для YouTube, Smart TV и других сервисов без публикации приватных VPN-ключей.
+Цель: сохранить структуру и безопасные примеры конфигов, чтобы можно было восстановить настройку роутерного VPN/proxy для YouTube, Smart TV, Telegram, Claude, ChatGPT mobile и других сервисов без публикации приватных VPN-ключей.
 
 ## Router
 
@@ -48,6 +50,17 @@ ext:geosite_v2fly.dat:category-ads-all
 ```
 
 That file was not present on the router, so Xray failed to start. The working routing file removes only that missing geosite reference and keeps the rest of the rules.
+
+The working routing file also includes explicit rules for services that were
+not fully covered by the generated config:
+
+- YouTube / Smart TV
+- Kino.pub
+- WOT Blitz / Tanks Blitz
+- Telegram domains and Telegram MTProto IP ranges
+- Claude / Anthropic
+- ChatGPT / OpenAI web and mobile domains
+- `UDP/443` through `vless-reality` for mobile apps that use QUIC/HTTP3
 
 Working public copy:
 
@@ -119,4 +132,4 @@ For Entware Dropbear key auth, put public keys here:
 
 ## Keywords
 
-Keenetic, Netcraze, Hopper, NC-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, router VPN, KeeneticOS, OpenWrt alternative, YouTube на Smart TV, VPN на роутере.
+Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, router VPN, KeeneticOS, OpenWrt alternative, YouTube на Smart TV, VPN на роутере, Telegram на Keenetic, ChatGPT mobile, Claude, Anthropic, Kino.pub, WOT Blitz, Tanks Blitz, QUIC, HTTP3, UDP 443, BlancVPN на роутере, VLESS на роутере.

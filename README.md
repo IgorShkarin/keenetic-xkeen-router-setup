@@ -16,11 +16,18 @@ The setup was used for router-level access to:
 - YouTube on Smart TV
 - Kino.pub on LG webOS TV
 - WOT Blitz / Tanks Blitz
+- Telegram on mobile and desktop
+- Claude
+- ChatGPT web and ChatGPT mobile app
 - OpenAI / ChatGPT / Codex
 
 The most useful debugging pattern was simple: enable temporary Xray access logs,
 reproduce the broken app on the target device, find domains that still go
 `direct`, and add only those domains or IPs to the `vless-reality` route.
+
+For some mobile apps, routing domains was not enough. The working fix was to
+route `UDP/443` through `vless-reality`, because apps may use QUIC/HTTP3 and
+skip the domain-based routing path.
 
 ## Коротко по-русски
 
@@ -32,11 +39,12 @@ reproduce the broken app on the target device, find domains that still go
 
 - есть безопасные примеры конфигов XKeen/Xray;
 - есть фикс ошибки с отсутствующим `geosite_v2fly.dat`;
-- есть пример точечной маршрутизации для YouTube, Kino.pub и WOT Blitz;
+- есть пример точечной маршрутизации для YouTube, Kino.pub, WOT Blitz, Telegram, Claude и ChatGPT;
+- есть фикс для мобильных приложений через маршрутизацию `UDP/443` в VLESS;
 - есть структура резервной копии;
 - нет реальных ключей, UUID, VLESS-ссылок и BlancVPN-секретов.
 
-Если репозиторий сэкономил тебе вечер боли с роутером, поставь звезду - так его проще найдут другие.
+Если репозиторий сэкономил тебе вечер боли с роутером, поставь звезду - так его проще найдут другие люди с Keenetic, XKeen, BlancVPN, VLESS Reality и Smart TV.
 
 ## What This Repository Is For
 
@@ -60,10 +68,11 @@ It does **not** contain real VPN credentials.
 This repository may help if:
 
 - you have a Keenetic or Netcraze router with USB support;
-- you want router-level VPN/proxy for YouTube, Smart TV, Telegram, streaming, or blocked domains;
+- you want router-level VPN/proxy for YouTube, Smart TV, Telegram, Claude, ChatGPT mobile, streaming, or blocked domains;
 - you use BlancVPN, VLESS Reality, Xray, or similar configs;
 - you do not want to flash OpenWrt yet;
 - XKeen starts failing because a generated routing config references a missing GeoSite file;
+- mobile apps still fail even though the same service works in a browser;
 - you want a safe public backup structure without publishing private VPN credentials.
 
 ## Why This Exists
@@ -95,6 +104,9 @@ Because `geosite_v2fly.dat` was missing, Xray failed to start. The working routi
 | YouTube or Smart TV does not work through router VPN | XKeen/Xray may be down, wrong policy may be selected, or DNS/routing may be inconsistent | Check `xkeen -status`, routing policy, DNS, and config files |
 | Kino.pub interface opens but posters or films do not load on TV | TV app uses extra CDN/API domains or raw IPs that may still go `direct` | Add observed domains/IPs from Xray logs to the `vless-reality` route |
 | WOT Blitz still detects RU region | The game uses domains such as `wotb.app` and `gamegrids.net`, not only obvious Wargaming/Lesta domains | Route the actual domains seen in Xray logs through VPN |
+| Telegram does not connect on home Wi-Fi | Telegram apps may use direct MTProto IP ranges, not only web domains | Route Telegram domains and Telegram IP ranges through VPN |
+| ChatGPT works in browser but mobile app says country is unavailable | Mobile app may use QUIC/HTTP3 over `UDP/443`, bypassing domain-based routing | Route `UDP/443` through `vless-reality` |
+| Claude redirects to region unavailable page | Claude domains are not in the VPN route | Add `claude.com` and `anthropic.com` to the VPN route |
 | Public backup is risky | Real `04_outbounds.json` contains VPN credentials | Store only `04_outbounds.template.json` publicly |
 
 ## Repository Contents
@@ -231,4 +243,4 @@ This README and repository structure were prepared with AI assistance. The netwo
 
 ## Keywords
 
-Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, YouTube, Smart TV, router VPN, KeeneticOS, OpenWrt alternative, VPN на роутере, YouTube на телевизоре, YouTube на Smart TV, обход блокировок на Keenetic, настройка XKeen.
+Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, YouTube, Smart TV, Telegram, Claude, ChatGPT, ChatGPT mobile, OpenAI, Kino.pub, WOT Blitz, Tanks Blitz, QUIC, HTTP3, UDP 443, router VPN, KeeneticOS, OpenWrt alternative, VPN на роутере, YouTube на телевизоре, YouTube на Smart TV, ChatGPT на телефоне, Telegram на Keenetic, обход блокировок на Keenetic, настройка XKeen, BlancVPN на роутере, VLESS на роутере.

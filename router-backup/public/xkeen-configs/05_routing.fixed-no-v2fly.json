@@ -58,7 +58,15 @@
           "domain:cdnservices.link",
           "domain:cdn9-78.yahoo.com",
           "domain:wotb.app",
-          "domain:gamegrids.net"
+          "domain:gamegrids.net",
+          "domain:claude.com",
+          "domain:anthropic.com",
+          "domain:telegram.org",
+          "domain:t.me",
+          "domain:telegram.me",
+          "domain:telegram.dog",
+          "domain:telegra.ph",
+          "domain:tdesktop.com"
         ]
       },
       {
@@ -73,7 +81,14 @@
           "104.21.47.115/32",
           "104.21.25.254/32",
           "34.102.133.179/32",
-          "65.9.62.30/32"
+          "65.9.62.30/32",
+          "91.108.4.0/22",
+          "91.108.8.0/22",
+          "91.108.12.0/22",
+          "91.108.16.0/22",
+          "91.108.20.0/22",
+          "91.108.56.0/22",
+          "149.154.160.0/20"
         ]
       },
       {

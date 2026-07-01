@@ -111,6 +111,15 @@
           "redirect",
           "tproxy"
         ],
+        "outboundTag": "vless-reality",
+        "network": "udp",
+        "port": "443"
+      },
+      {
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
         "outboundTag": "direct",
         "network": "tcp,udp"
       }

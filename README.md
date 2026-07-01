@@ -9,6 +9,19 @@ Practical backup and notes for running XKeen + Xray on a Keenetic / Netcraze rou
 
 The setup was tested on **Netcraze / Keenetic Hopper NC-3811** with KeeneticOS 5.x, Entware, XKeen 2.0 Stable, and Xray 26.6.27.
 
+## Tested Services
+
+The setup was used for router-level access to:
+
+- YouTube on Smart TV
+- Kino.pub on LG webOS TV
+- WOT Blitz / Tanks Blitz
+- OpenAI / ChatGPT / Codex
+
+The most useful debugging pattern was simple: enable temporary Xray access logs,
+reproduce the broken app on the target device, find domains that still go
+`direct`, and add only those domains or IPs to the `vless-reality` route.
+
 ## Коротко по-русски
 
 Это рабочий публичный конспект настройки **XKeen + Xray + VLESS Reality** на роутере **Keenetic / Netcraze Hopper NC-3811** через **Entware / OPKG на USB-флешке**.
@@ -19,6 +32,7 @@ The setup was tested on **Netcraze / Keenetic Hopper NC-3811** with KeeneticOS 5
 
 - есть безопасные примеры конфигов XKeen/Xray;
 - есть фикс ошибки с отсутствующим `geosite_v2fly.dat`;
+- есть пример точечной маршрутизации для YouTube, Kino.pub и WOT Blitz;
 - есть структура резервной копии;
 - нет реальных ключей, UUID, VLESS-ссылок и BlancVPN-секретов.
 
@@ -79,6 +93,8 @@ Because `geosite_v2fly.dat` was missing, Xray failed to start. The working routi
 | --- | --- | --- |
 | Xray does not start through XKeen | Generated routing config references `geosite_v2fly.dat`, but the file is absent on the router | Use `05_routing.fixed-no-v2fly.json` as `05_routing.json` |
 | YouTube or Smart TV does not work through router VPN | XKeen/Xray may be down, wrong policy may be selected, or DNS/routing may be inconsistent | Check `xkeen -status`, routing policy, DNS, and config files |
+| Kino.pub interface opens but posters or films do not load on TV | TV app uses extra CDN/API domains or raw IPs that may still go `direct` | Add observed domains/IPs from Xray logs to the `vless-reality` route |
+| WOT Blitz still detects RU region | The game uses domains such as `wotb.app` and `gamegrids.net`, not only obvious Wargaming/Lesta domains | Route the actual domains seen in Xray logs through VPN |
 | Public backup is risky | Real `04_outbounds.json` contains VPN credentials | Store only `04_outbounds.template.json` publicly |
 
 ## Repository Contents

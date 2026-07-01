@@ -54,7 +54,26 @@
           "domain:wgcdn.co",
           "domain:lesta.ru",
           "domain:lesta.games",
-          "domain:tanksblitz.ru"
+          "domain:tanksblitz.ru",
+          "domain:cdnservices.link",
+          "domain:cdn9-78.yahoo.com",
+          "domain:wotb.app",
+          "domain:gamegrids.net"
+        ]
+      },
+      {
+        "inboundTag": [
+          "redirect",
+          "tproxy"
+        ],
+        "outboundTag": "vless-reality",
+        "ip": [
+          "109.238.90.239/32",
+          "178.248.233.148/32",
+          "104.21.47.115/32",
+          "104.21.25.254/32",
+          "34.102.133.179/32",
+          "65.9.62.30/32"
         ]
       },
       {

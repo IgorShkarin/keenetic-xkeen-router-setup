@@ -58,6 +58,7 @@ not fully covered by the generated config:
 - Kino.pub
 - WOT Blitz / Tanks Blitz
 - Telegram domains and Telegram MTProto IP ranges
+- Telegram media/CDN IPs observed from Xray access logs
 - Claude / Anthropic
 - ChatGPT / OpenAI web and mobile domains
 - `UDP/443` through `vless-reality` for mobile apps that use QUIC/HTTP3
@@ -129,7 +130,10 @@ For Entware Dropbear key auth, put public keys here:
 - Assign target TV or other clients to the `xkeen` policy.
 - Change default Entware root password from `keenetic`.
 - After a router reboot, verify `xkeen -status`.
+- If Telegram opens but pictures or avatars do not load, temporarily enable
+  Xray access logs, reproduce the issue on the phone, and route only the
+  observed media/CDN IPs that still go `direct`.
 
 ## Keywords
 
-Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, router VPN, KeeneticOS, OpenWrt alternative, YouTube на Smart TV, VPN на роутере, Telegram на Keenetic, ChatGPT mobile, Claude, Anthropic, Kino.pub, WOT Blitz, Tanks Blitz, QUIC, HTTP3, UDP 443, BlancVPN на роутере, VLESS на роутере.
+Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, router VPN, KeeneticOS, OpenWrt alternative, YouTube на Smart TV, VPN на роутере, Telegram на Keenetic, Telegram media, Telegram CDN, не грузятся картинки Telegram, ChatGPT mobile, Claude, Anthropic, Kino.pub, WOT Blitz, Tanks Blitz, QUIC, HTTP3, UDP 443, BlancVPN на роутере, VLESS на роутере.

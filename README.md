@@ -41,6 +41,7 @@ skip the domain-based routing path.
 - есть фикс ошибки с отсутствующим `geosite_v2fly.dat`;
 - есть пример точечной маршрутизации для YouTube, Kino.pub, WOT Blitz, Telegram, Claude и ChatGPT;
 - есть фикс для мобильных приложений через маршрутизацию `UDP/443` в VLESS;
+- есть фикс для Telegram media/CDN, когда сообщения работают, но картинки и аватарки не грузятся;
 - есть структура резервной копии;
 - нет реальных ключей, UUID, VLESS-ссылок и BlancVPN-секретов.
 
@@ -69,6 +70,7 @@ This repository may help if:
 
 - you have a Keenetic or Netcraze router with USB support;
 - you want router-level VPN/proxy for YouTube, Smart TV, Telegram, Claude, ChatGPT mobile, streaming, or blocked domains;
+- Telegram connects, but images, avatars, previews, or media files do not load on mobile Wi-Fi;
 - you use BlancVPN, VLESS Reality, Xray, or similar configs;
 - you do not want to flash OpenWrt yet;
 - XKeen starts failing because a generated routing config references a missing GeoSite file;
@@ -105,6 +107,7 @@ Because `geosite_v2fly.dat` was missing, Xray failed to start. The working routi
 | Kino.pub interface opens but posters or films do not load on TV | TV app uses extra CDN/API domains or raw IPs that may still go `direct` | Add observed domains/IPs from Xray logs to the `vless-reality` route |
 | WOT Blitz still detects RU region | The game uses domains such as `wotb.app` and `gamegrids.net`, not only obvious Wargaming/Lesta domains | Route the actual domains seen in Xray logs through VPN |
 | Telegram does not connect on home Wi-Fi | Telegram apps may use direct MTProto IP ranges, not only web domains | Route Telegram domains and Telegram IP ranges through VPN |
+| Telegram messages work, but pictures or avatars do not load | Telegram media/CDN can use extra IPs outside the common MTProto ranges; in this tested case `91.105.192.100` and `194.221.250.50` went `direct` and timed out | Route observed Telegram media/CDN IPs through `vless-reality` |
 | ChatGPT works in browser but mobile app says country is unavailable | Mobile app may use QUIC/HTTP3 over `UDP/443`, bypassing domain-based routing | Route `UDP/443` through `vless-reality` |
 | Claude redirects to region unavailable page | Claude domains are not in the VPN route | Add `claude.com` and `anthropic.com` to the VPN route |
 | Public backup is risky | Real `04_outbounds.json` contains VPN credentials | Store only `04_outbounds.template.json` publicly |
@@ -284,4 +287,4 @@ This README and repository structure were prepared with AI assistance. The netwo
 
 ## Keywords
 
-Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, YouTube, Smart TV, Telegram, Claude, ChatGPT, ChatGPT mobile, OpenAI, Kino.pub, WOT Blitz, Tanks Blitz, QUIC, HTTP3, UDP 443, router VPN, KeeneticOS, OpenWrt alternative, VPN на роутере, YouTube на телевизоре, YouTube на Smart TV, ChatGPT на телефоне, Telegram на Keenetic, обход блокировок на Keenetic, настройка XKeen, BlancVPN на роутере, VLESS на роутере.
+Keenetic, Netcraze, Hopper, NC-3811, KN-3811, XKeen, Entware, OPKG, Xray, VLESS Reality, BlancVPN, YouTube, Smart TV, Telegram, Telegram media, Telegram CDN, Claude, ChatGPT, ChatGPT mobile, OpenAI, Kino.pub, WOT Blitz, Tanks Blitz, QUIC, HTTP3, UDP 443, router VPN, KeeneticOS, OpenWrt alternative, VPN на роутере, YouTube на телевизоре, YouTube на Smart TV, ChatGPT на телефоне, Telegram на Keenetic, не грузятся картинки Telegram, Telegram media через VPN, обход блокировок на Keenetic, настройка XKeen, BlancVPN на роутере, VLESS на роутере.

@@ -91,6 +91,13 @@ router-backup/public/xkeen-configs/04_outbounds.template.json
 router-backup/public/xkeen-configs/05_routing.fixed-no-v2fly.json
 ```
 
+The dated current-state snapshot is kept separately so older recovery files
+remain historical and are not mistaken for the latest private profile:
+
+```text
+router-backup/public/snapshots/2026-09-01/
+```
+
 Replace the template outbound file with your own private `04_outbounds.json` only on the router or in a private backup.
 
 ## Restore

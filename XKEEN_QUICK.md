@@ -34,7 +34,16 @@ ssh root@192.168.1.1 'xkeen -restart; xkeen -status'
 ipconfig getifaddr en0; route -n get 192.168.1.1; ping -c 2 192.168.1.1; nc -vz -w 3 192.168.1.1 22; nc -vz -w 3 192.168.1.1 2022
 ```
 
-## Тест YouTube и ChatGPT через VLESS
+## Тест Blanc VLESS: YouTube + ChatGPT
 
-Пока не установлен. Для него требуется один раз добавить локальный SOCKS-вход
-`127.0.0.1:10808`, проверить конфигурацию и перезапустить XKeen.
+Запускает XKeen, делает запросы с самого роутера через локальный тестовый вход,
+показывает HTTP-результат и строки с outbound `vless-reality`, затем выключает
+XKeen:
+
+```bash
+ssh root@192.168.1.1 'set +e; xkeen -start; sleep 2; curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null --connect-timeout 10 --max-time 20 -w "YouTube http=%{http_code} total=%{time_total}s\n" https://www.youtube.com/generate_204; curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null --connect-timeout 10 --max-time 20 -w "ChatGPT http=%{http_code} total=%{time_total}s\n" https://chatgpt.com/cdn-cgi/trace; echo "--- route log ---"; tail -n 120 /opt/var/log/xray/access.log | grep -Ei "codex-test-socks.*(youtube|chatgpt).*vless-reality" | tail -n 10; xkeen -stop; xkeen -status'
+```
+
+`HTTP 000` означает timeout/ошибку соединения. Строка
+`[codex-test-socks >> vless-reality]` подтверждает выбор маршрута Blanc;
+сама по себе она ещё не означает, что внешний ответ получен.

@@ -31,9 +31,9 @@ remote_file=/opt/etc/xray/configs/04_outbounds.json
 stamp="$(date +%Y%m%d-%H%M%S)"
 backup="${remote_file}.bak-codex-country-$stamp"
 scp -O -q "$tmp/out.json" "root@$ROUTER:/tmp/04_outbounds.codex-country.json"
-if ! ssh root@$ROUTER "set -e; cp -p '$remote_file' '$backup'; xkeen -stop >/dev/null 2>&1 || true; mv /tmp/04_outbounds.codex-country.json '$remote_file'; XRAY_LOCATION_ASSET=/opt/etc/xray/dat xray convert pb -outpbfile /tmp/check-country.pb /opt/etc/xray/configs/*.json >/tmp/check-country.log 2>&1; xkeen -start >/dev/null 2>&1; sleep 2; xkeen -status | grep -q 'запущен'"; then
+if ! ssh root@$ROUTER "set -e; cp -p '$remote_file' '$backup'; xkeen -stop >/dev/null 2>&1 || true; sleep 2; mv /tmp/04_outbounds.codex-country.json '$remote_file'; XRAY_LOCATION_ASSET=/opt/etc/xray/dat xray convert pb -outpbfile /tmp/check-country.pb /opt/etc/xray/configs/*.json >/tmp/check-country.log 2>&1; xkeen -start >/dev/null 2>&1; i=0; while [ \$i -lt 10 ]; do sleep 1; xkeen -status | grep -q 'в режиме' && exit 0; i=\$((i + 1)); done; exit 1"; then
   echo "Не удалось запустить новый узел; откатываю." >&2
-  ssh root@$ROUTER "cp -p '$backup' '$remote_file'; xkeen -stop >/dev/null 2>&1 || true"
+  ssh root@$ROUTER "xkeen -stop >/dev/null 2>&1 || true; sleep 2; cp -p '$backup' '$remote_file'; xkeen -start >/dev/null 2>&1 || true"
   exit 1
 fi
 
@@ -44,7 +44,7 @@ set -e
 echo "$result"
 if [[ "$status" -ne 0 ]] || ! grep -Eq 'YouTube HTTP 2(00|04)' <<<"$result" || ! grep -Eq 'ChatGPT HTTP 2[0-9][0-9]' <<<"$result"; then
   echo "Тест не пройден; откатываю предыдущий outbound." >&2
-  ssh root@$ROUTER "cp -p '$backup' '$remote_file'; xkeen -stop >/dev/null 2>&1 || true"
+  ssh root@$ROUTER "xkeen -stop >/dev/null 2>&1 || true; sleep 2; cp -p '$backup' '$remote_file'; xkeen -start >/dev/null 2>&1 || true"
   exit 1
 fi
 echo "Готово: узел переключён и тест пройден. Backup: $backup"

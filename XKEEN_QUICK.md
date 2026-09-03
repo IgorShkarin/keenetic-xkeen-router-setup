@@ -54,6 +54,13 @@ ssh root@192.168.1.1 'set +e; xkeen -start; sleep 2; curl --proxy socks5h://127.
 неудачный вариант:
 
 ```bash
+cd /Users/igor/Documents/VPN
+./tools/blanc-country.sh near
+```
+
+Для конкретной страны:
+
+```bash
 ./tools/blanc-country.sh fi
 ```
 
@@ -62,3 +69,23 @@ ssh root@192.168.1.1 'set +e; xkeen -start; sleep 2; curl --proxy socks5h://127.
 `./tools/blanc-country.sh near`. При первом запуске ссылка подписки один раз
 вводится в защищённый запрос macOS Keychain. После успешной проверки XKeen
 остаётся включённым; при неудаче предыдущая конфигурация восстанавливается.
+
+## Автоматическое восстановление VLESS
+
+Монитор на роутере проверяет YouTube и ChatGPT раз в 3 минуты. После двух
+ошибок подряд он перебирает сохранённые страны и оставляет первый рабочий
+узел. Между переключениями действует пауза 20 минут.
+
+```bash
+ssh root@192.168.1.1 'blanc-auto status'
+ssh root@192.168.1.1 'blanc-auto test'
+ssh root@192.168.1.1 'blanc-auto on'
+ssh root@192.168.1.1 'blanc-auto off'
+```
+
+`off` выключает только автоматику и не останавливает XKeen. Для немедленной
+ручной проверки и возможного переключения:
+
+```bash
+ssh root@192.168.1.1 'blanc-auto run; blanc-auto status'
+```

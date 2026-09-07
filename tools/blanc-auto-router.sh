@@ -33,6 +33,15 @@ wait_xkeen() {
     return 1
 }
 
+start_xkeen() {
+    xkeen -start >/dev/null 2>&1 || true
+    wait_xkeen && return 0
+    xkeen -stop >/dev/null 2>&1 || true
+    sleep 3
+    xkeen -start >/dev/null 2>&1 || true
+    wait_xkeen
+}
+
 probe() {
     xkeen_up || return 1
     yt=$(curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null \
@@ -52,8 +61,7 @@ restore_last_good() {
     xkeen -stop >/dev/null 2>&1 || true
     sleep 2
     cp -p "$STATE/last-good.json" "$ACTIVE"
-    xkeen -start >/dev/null 2>&1 || true
-    wait_xkeen
+    start_xkeen
 }
 
 try_country() {
@@ -71,13 +79,11 @@ try_country() {
         >/tmp/blanc-auto-check.log 2>&1; then
         log "country=$code config_invalid"
         cp -p "$STATE/pre-switch.json" "$ACTIVE"
-        xkeen -start >/dev/null 2>&1 || true
-        wait_xkeen || true
+        start_xkeen || true
         return 1
     fi
 
-    xkeen -start >/dev/null 2>&1 || true
-    if wait_xkeen && probe; then
+    if start_xkeen && probe; then
         cp -p "$ACTIVE" "$STATE/last-good.json"
         printf '%s\n' "$code" > "$STATE/current"
         printf '0\n' > "$STATE/fails"
@@ -90,8 +96,7 @@ try_country() {
     xkeen -stop >/dev/null 2>&1 || true
     sleep 2
     cp -p "$STATE/pre-switch.json" "$ACTIVE"
-    xkeen -start >/dev/null 2>&1 || true
-    wait_xkeen || true
+    start_xkeen || true
     return 1
 }
 
@@ -124,10 +129,14 @@ run_check() {
         fi
     done
 
-    restore_last_good || true
+    if restore_last_good; then
+        restored=up
+    else
+        restored=failed
+    fi
     printf '0\n' > "$STATE/fails"
     date '+%s' | awk -v add="$COOLDOWN_SECONDS" '{print $1 + add}' > "$STATE/cooldown-until"
-    log "all_candidates_failed restored_last_good"
+    log "all_candidates_failed restored_last_good=$restored"
     return 1
 }
 
@@ -147,6 +156,14 @@ case "${1:-status}" in
     run)
         run_check
         ;;
+    recover)
+        if restore_last_good; then
+            echo "Last-good restored; XKeen: UP"
+        else
+            echo "Last-good restore failed"
+            exit 1
+        fi
+        ;;
     status)
         if [ -f "$ENABLED" ]; then enabled=ON; else enabled=OFF; fi
         current=$(cat "$STATE/current" 2>/dev/null || echo unknown)
@@ -156,7 +173,7 @@ case "${1:-status}" in
         tail -n 5 "$LOG" 2>/dev/null || true
         ;;
     *)
-        echo "Usage: blanc-auto on|off|status|test|run"
+        echo "Usage: blanc-auto on|off|status|test|run|recover"
         exit 2
         ;;
 esac

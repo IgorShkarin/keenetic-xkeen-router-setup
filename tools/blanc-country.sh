@@ -5,6 +5,10 @@ ROUTER="${XKEEN_ROUTER:-192.168.1.1}"
 COUNTRY="${1:-}"
 SERVICE="codex-blancvpn-subscription"
 [[ -n "$COUNTRY" ]] || { echo "Использование: $0 ee|se|fi|pl|lt|ch|nl"; exit 2; }
+case "$COUNTRY" in
+  ee|se|fi|pl|lt|ch|nl|near|nearby) ;;
+  *) echo "Неизвестная страна: $COUNTRY" >&2; exit 2 ;;
+esac
 
 if [[ "$COUNTRY" == "near" || "$COUNTRY" == "nearby" ]]; then
   for country in ee se fi pl lt; do
@@ -23,7 +27,18 @@ fi
 
 tmp="$(mktemp -d /tmp/blanc-country.XXXXXX)"
 trap 'rm -rf "$tmp"' EXIT
-curl -fsSL --connect-timeout 10 --max-time 30 "$SUB_URL" -o "$tmp/sub"
+case "$SUB_URL" in
+  https://*) ;;
+  *) echo "Keychain содержит некорректную ссылку подписки." >&2; exit 1 ;;
+esac
+[[ "$SUB_URL" != *$'\n'* && "$SUB_URL" != *'"'* ]] || {
+  echo "Ссылка подписки содержит недопустимые символы." >&2
+  exit 1
+}
+umask 077
+printf 'url = "%s"\n' "$SUB_URL" > "$tmp/curl.conf"
+curl -fsSL --connect-timeout 10 --max-time 30 --config "$tmp/curl.conf" -o "$tmp/sub"
+rm -f "$tmp/curl.conf"
 if base64 -D -i "$tmp/sub" > "$tmp/list" 2>/dev/null && rg -q '^vless://' "$tmp/list"; then :; else cp "$tmp/sub" "$tmp/list"; fi
 python3 "$(dirname "$0")/blanc_vless_to_xray.py" "$tmp/list" "$tmp/out.json" "$COUNTRY"
 
@@ -31,20 +46,23 @@ remote_file=/opt/etc/xray/configs/04_outbounds.json
 stamp="$(date +%Y%m%d-%H%M%S)"
 backup="${remote_file}.bak-codex-country-$stamp"
 scp -O -q "$tmp/out.json" "root@$ROUTER:/tmp/04_outbounds.codex-country.json"
-if ! ssh root@$ROUTER "set -e; cp -p '$remote_file' '$backup'; xkeen -stop >/dev/null 2>&1 || true; sleep 2; mv /tmp/04_outbounds.codex-country.json '$remote_file'; XRAY_LOCATION_ASSET=/opt/etc/xray/dat xray convert pb -outpbfile /tmp/check-country.pb /opt/etc/xray/configs/*.json >/tmp/check-country.log 2>&1; xkeen -start >/dev/null 2>&1; i=0; while [ \$i -lt 10 ]; do sleep 1; xkeen -status | grep -q 'в режиме' && exit 0; i=\$((i + 1)); done; exit 1"; then
+if ! ssh "root@$ROUTER" "set -e; cp -p '$remote_file' '$backup'; xkeen -stop >/dev/null 2>&1 || true; sleep 2; mv /tmp/04_outbounds.codex-country.json '$remote_file'; XRAY_LOCATION_ASSET=/opt/etc/xray/dat xray convert pb -outpbfile /tmp/check-country.pb /opt/etc/xray/configs/*.json >/tmp/check-country.log 2>&1; xkeen -start >/dev/null 2>&1; i=0; while [ \$i -lt 10 ]; do sleep 1; xkeen -status | grep -q 'в режиме' && exit 0; i=\$((i + 1)); done; exit 1"; then
   echo "Не удалось запустить новый узел; откатываю." >&2
-  ssh root@$ROUTER "xkeen -stop >/dev/null 2>&1 || true; sleep 2; cp -p '$backup' '$remote_file'; xkeen -start >/dev/null 2>&1 || true"
+  ssh "root@$ROUTER" "xkeen -stop >/dev/null 2>&1 || true; sleep 2; cp -p '$backup' '$remote_file'; xkeen -start >/dev/null 2>&1 || true"
   exit 1
 fi
 
 set +e
-result="$(ssh root@$ROUTER 'curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null --connect-timeout 10 --max-time 20 -w "YouTube HTTP %{http_code} total=%{time_total}s\n" https://www.youtube.com/generate_204; y=$?; curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null --connect-timeout 10 --max-time 20 -w "ChatGPT HTTP %{http_code} total=%{time_total}s\n" https://chatgpt.com/cdn-cgi/trace; c=$?; echo "exit youtube=$y chatgpt=$c"; tail -n 160 /opt/var/log/xray/error.log | grep -Ei "proxy/socks.*(youtube|chatgpt)|proxy/vless/outbound.*tunneling" | tail -n 10')"
+result="$(ssh "root@$ROUTER" 'curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null --connect-timeout 10 --max-time 20 -w "YouTube HTTP %{http_code} total=%{time_total}s\n" https://www.youtube.com/generate_204; y=$?; curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null --connect-timeout 10 --max-time 20 -w "ChatGPT HTTP %{http_code} total=%{time_total}s\n" https://chatgpt.com/cdn-cgi/trace; c=$?; echo "exit youtube=$y chatgpt=$c"; tail -n 160 /opt/var/log/xray/error.log | grep -Ei "proxy/socks.*(youtube|chatgpt)|proxy/vless/outbound.*tunneling" | tail -n 10')"
 status=$?
 set -e
 echo "$result"
 if [[ "$status" -ne 0 ]] || ! grep -Eq 'YouTube HTTP 2(00|04)' <<<"$result" || ! grep -Eq 'ChatGPT HTTP 2[0-9][0-9]' <<<"$result"; then
   echo "Тест не пройден; откатываю предыдущий outbound." >&2
-  ssh root@$ROUTER "xkeen -stop >/dev/null 2>&1 || true; sleep 2; cp -p '$backup' '$remote_file'; xkeen -start >/dev/null 2>&1 || true"
+  ssh "root@$ROUTER" "xkeen -stop >/dev/null 2>&1 || true; sleep 2; cp -p '$backup' '$remote_file'; xkeen -start >/dev/null 2>&1 || true"
   exit 1
+fi
+if ssh "root@$ROUTER" 'test -x /opt/sbin/blanc-auto'; then
+  ssh "root@$ROUTER" "/opt/sbin/blanc-auto adopt '$COUNTRY'"
 fi
 echo "Готово: узел переключён и тест пройден. Backup: $backup"

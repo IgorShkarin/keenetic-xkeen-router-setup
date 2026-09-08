@@ -74,9 +74,10 @@ cd /Users/igor/Documents/VPN
 
 Монитор на роутере проверяет YouTube и ChatGPT раз в 3 минуты. После двух
 ошибок подряд он перебирает сохранённые страны и оставляет первый рабочий
-узел. Между переключениями действует пауза 20 минут. Если все VLESS-узлы
-недоступны, монитор возвращает last-good и оставляет Xray запущенным, чтобы
-правила `direct` (например, Кинопоиск на LG) продолжали работать.
+узел. Между переключениями действует пауза 20 минут. Если все сохранённые
+узлы и `last-good` недоступны, монитор оставляет Xray запущенным для правил
+`direct`, но фиксирует `health: degraded` и `refresh: required`. Счётчик
+ошибок больше не сбрасывается в ложный ноль.
 
 ```bash
 ssh root@192.168.1.1 'blanc-auto status'
@@ -84,6 +85,7 @@ ssh root@192.168.1.1 'blanc-auto test'
 ssh root@192.168.1.1 'blanc-auto on'
 ssh root@192.168.1.1 'blanc-auto off'
 ssh root@192.168.1.1 'blanc-auto recover'
+ssh root@192.168.1.1 'blanc-auto needs-refresh'
 ```
 
 `off` выключает только автоматику и не останавливает XKeen. Для немедленной
@@ -92,3 +94,34 @@ ssh root@192.168.1.1 'blanc-auto recover'
 ```bash
 ssh root@192.168.1.1 'blanc-auto run; blanc-auto status'
 ```
+
+Принудительно перебрать весь сохранённый пул, включая текущую страну:
+
+```bash
+ssh root@192.168.1.1 'blanc-auto force; blanc-auto status'
+```
+
+## Страховка от устаревшей подписки
+
+Роутер не хранит приватную ссылку Blanc: она остаётся в macOS Keychain.
+LaunchAgent раз в 5 минут проверяет VPN. Пока VLESS здоров, он ничего не
+скачивает и не переключает. После полного отказа сохранённого пула агент
+загружает свежую подписку из Keychain, валидирует новые профили на роутере,
+запускает failover и показывает уведомление только при аварии или
+восстановлении.
+
+Установка или обновление:
+
+```bash
+cd /Users/igor/Documents/VPN
+./tools/install-blanc-auto.sh
+./tools/install-blanc-refresh-agent.sh
+```
+
+Ручная проверка того же контура:
+
+```bash
+./tools/blanc-refresh-if-needed.sh
+```
+
+Лог macOS: `~/Library/Logs/blanc-router-refresh.log`.

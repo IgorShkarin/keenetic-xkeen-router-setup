@@ -125,3 +125,7 @@ cd /Users/igor/Documents/VPN
 ```
 
 Лог macOS: `~/Library/Logs/blanc-router-refresh.log`.
+Исполняемая копия агента хранится вне `Documents`, в
+`~/Library/Application Support/Blanc Router Monitor/bin`, потому что macOS
+может запрещать launchd запускать фоновые сценарии непосредственно из
+пользовательской папки `Documents`.

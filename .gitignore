@@ -1,4 +1,5 @@
 router-backup/private/
+private-backups/
 artifacts/incidents/*
 artifacts/routing-candidates/*
 artifacts/release-checks/*

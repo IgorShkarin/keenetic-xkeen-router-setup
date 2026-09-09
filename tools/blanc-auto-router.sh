@@ -14,6 +14,10 @@ LOCK=/tmp/blanc-auto.lock
 ORDER="ee ch se fi pl lt nl"
 COOLDOWN_SECONDS=1200
 RECOVERY_INTERVAL_SECONDS=900
+FAILOVER_OPEN_UNTIL="$STATE/failover-open-until"
+FAILOVER_FAILURES="$STATE/failover-failures"
+FAILOVER_BACKOFF_BASE_SECONDS=1800
+FAILOVER_BACKOFF_MAX_SECONDS=21600
 
 mkdir -p "$STATE"
 
@@ -41,6 +45,42 @@ set_mode() {
     printf '%s\n' "$1" > "$MODE"
 }
 
+read_number() {
+    value=$(cat "$1" 2>/dev/null || true)
+    case "$value" in
+        ''|*[!0-9]*) printf '0\n' ;;
+        *) printf '%s\n' "$value" ;;
+    esac
+}
+
+failover_circuit_open() {
+    now=$1
+    until=$(read_number "$FAILOVER_OPEN_UNTIL")
+    [ "$until" -gt "$now" ]
+}
+
+clear_failover_circuit() {
+    rm -f "$FAILOVER_OPEN_UNTIL" "$FAILOVER_FAILURES"
+}
+
+open_failover_circuit() {
+    failures=$(read_number "$FAILOVER_FAILURES")
+    failures=$((failures + 1))
+    delay=$FAILOVER_BACKOFF_BASE_SECONDS
+    i=1
+    while [ "$i" -lt "$failures" ]; do
+        delay=$((delay * 2))
+        if [ "$delay" -ge "$FAILOVER_BACKOFF_MAX_SECONDS" ]; then
+            delay=$FAILOVER_BACKOFF_MAX_SECONDS
+            break
+        fi
+        i=$((i + 1))
+    done
+    printf '%s\n' "$failures" > "$FAILOVER_FAILURES"
+    date '+%s' | awk -v add="$delay" '{print $1 + add}' > "$FAILOVER_OPEN_UNTIL"
+    log "failover_circuit=open failures=$failures backoff=${delay}s"
+}
+
 mark_healthy() {
     printf 'healthy\n' > "$HEALTH"
     printf '0\n' > "$STATE/fails"
@@ -48,6 +88,7 @@ mark_healthy() {
     write_now "$STATE/last-ok"
     rm -f "$NEEDS_REFRESH"
     rm -f "$NEXT_RECOVERY"
+    clear_failover_circuit
     set_mode blanc
     cp -p "$ACTIVE" "$STATE/last-good.json"
 }
@@ -175,8 +216,13 @@ activate_amnezia() {
 try_blanc_recovery() {
     force=$1
     now=$(date '+%s')
+    fresh_pool=${BLANC_AUTO_FRESH_POOL:-0}
     next=$(cat "$NEXT_RECOVERY" 2>/dev/null || echo 0)
-    if [ "$force" != "1" ] && [ "$now" -lt "$next" ]; then
+    if [ "$fresh_pool" != "1" ] && failover_circuit_open "$now"; then
+        log "blanc_recovery_skipped circuit_open"
+        return 1
+    fi
+    if [ "$fresh_pool" != "1" ] && [ "$now" -lt "$next" ]; then
         return 0
     fi
     date '+%s' | awk -v add="$RECOVERY_INTERVAL_SECONDS" '{print $1 + add}' > "$NEXT_RECOVERY"
@@ -250,6 +296,7 @@ try_pool() {
 
 run_check() {
     force=${1:-0}
+    fresh_pool=${BLANC_AUTO_FRESH_POOL:-0}
     [ -f "$ENABLED" ] || [ "$force" = "1" ] || return 0
     if ! mkdir "$LOCK" 2>/dev/null; then
         log "check_skipped lock_busy"
@@ -274,7 +321,16 @@ run_check() {
 
     now=$(date '+%s')
     cooldown=$(cat "$STATE/cooldown-until" 2>/dev/null || echo 0)
-    if [ "$force" != "1" ] && [ "$now" -lt "$cooldown" ]; then
+    if [ "$fresh_pool" != "1" ] && failover_circuit_open "$now"; then
+        if probe; then
+            mark_healthy
+            return 0
+        fi
+        mark_warning
+        log "probe_failed circuit_open; failover_skipped"
+        return 1
+    fi
+    if [ "$fresh_pool" != "1" ] && [ "$now" -lt "$cooldown" ]; then
         return 0
     fi
 
@@ -288,7 +344,7 @@ run_check() {
     printf '%s\n' "$fails" > "$STATE/fails"
     mark_warning
     log "probe_failed count=$fails"
-    if [ "$force" != "1" ] && [ "$fails" -lt 2 ]; then
+    if [ "$fresh_pool" != "1" ] && [ "$fails" -lt 2 ]; then
         return 1
     fi
 
@@ -305,6 +361,7 @@ run_check() {
         return 0
     fi
 
+    open_failover_circuit
     if activate_amnezia; then
         return 0
     fi
@@ -382,7 +439,7 @@ case "${1:-status}" in
         ;;
     recover)
         if [ "$(mode_value)" = "amnezia" ]; then
-            if try_blanc_recovery 1; then
+            if BLANC_AUTO_FRESH_POOL=1 try_blanc_recovery 1; then
                 echo "Blanc recovery check finished; mode=$(mode_value)"
             else
                 echo "Blanc recovery failed; mode=$(mode_value)"
@@ -407,7 +464,9 @@ case "${1:-status}" in
         last_ok=$(cat "$STATE/last-ok" 2>/dev/null || echo never)
         if [ -f "$NEEDS_REFRESH" ]; then refresh=required; else refresh=no; fi
         if xkeen_up; then xstatus=UP; else xstatus=DOWN; fi
-        echo "Blanc auto: $enabled; XKeen: $xstatus; mode: $mode; country: $current; health: $health; failures: $fails; refresh: $refresh; last_check: $last_check; last_ok: $last_ok"
+        now=$(date '+%s')
+        if failover_circuit_open "$now"; then breaker=OPEN; else breaker=CLOSED; fi
+        echo "Blanc auto: $enabled; XKeen: $xstatus; mode: $mode; country: $current; health: $health; failures: $fails; refresh: $refresh; breaker: $breaker; last_check: $last_check; last_ok: $last_ok"
         tail -n 5 "$LOG" 2>/dev/null || true
         ;;
     *)

@@ -135,11 +135,10 @@ start_xkeen() {
     wait_xkeen
 }
 
-probe() {
-    xkeen_up || return 1
+probe_once() {
     yt=$(curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null \
         --connect-timeout 5 --max-time 10 -w '%{http_code}' \
-        https://www.youtube.com/generate_204 2>/dev/null || true)
+        https://www.youtube.com/ 2>/dev/null || true)
     gpt=$(curl --proxy socks5h://127.0.0.1:10808 -sS -o /dev/null \
         --connect-timeout 5 --max-time 10 -w '%{http_code}' \
         https://chatgpt.com/cdn-cgi/trace 2>/dev/null || true)
@@ -147,6 +146,17 @@ probe() {
         2??:2??) return 0 ;;
         *) return 1 ;;
     esac
+}
+
+probe() {
+    xkeen_up || return 1
+    attempt=1
+    while [ "$attempt" -le 3 ]; do
+        probe_once && return 0
+        [ "$attempt" -lt 3 ] && sleep 2
+        attempt=$((attempt + 1))
+    done
+    return 1
 }
 
 restore_last_good() {

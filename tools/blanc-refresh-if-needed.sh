@@ -7,6 +7,8 @@ STATE_DIR="${BLANC_REFRESH_STATE_DIR:-${HOME}/Library/Application Support/Blanc 
 STATE_FILE="$STATE_DIR/state"
 AMNEZIA_REFRESH_STAMP="$STATE_DIR/amnezia-last-refresh"
 AMNEZIA_REFRESH_COOLDOWN=1800
+BLANC_REFRESH_STAMP="$STATE_DIR/blanc-last-refresh"
+BLANC_REFRESH_COOLDOWN=3600
 SSH=(ssh -o BatchMode=yes -o ConnectTimeout=6 "root@$ROUTER")
 
 mkdir -p "$STATE_DIR"
@@ -39,6 +41,17 @@ mark_healthy() {
   write_state healthy
 }
 
+refresh_gate() {
+  local stamp_file="$1" cooldown="$2" now last
+  now="$(date +%s)"
+  last="$(cat "$stamp_file" 2>/dev/null || echo 0)"
+  if [[ "$last" =~ ^[0-9]+$ ]] && (( now - last < cooldown )); then
+    return 1
+  fi
+  printf '%s\n' "$now" > "$stamp_file"
+  return 0
+}
+
 if ! "${SSH[@]}" true >/dev/null 2>&1; then
   echo "Router is unreachable over SSH."
   mark_failure router-unreachable "Роутер недоступен по SSH; автоматическая проверка VPN не выполнена."
@@ -47,9 +60,7 @@ fi
 
 mode="$("${SSH[@]}" '/opt/sbin/blanc-auto mode' 2>/dev/null || echo blanc)"
 if [[ "$mode" == "amnezia" ]] && "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh' >/dev/null 2>&1; then
-  now="$(date +%s)"
-  last="$(cat "$AMNEZIA_REFRESH_STAMP" 2>/dev/null || echo 0)"
-  if [[ "$last" =~ ^[0-9]+$ ]] && (( now - last < AMNEZIA_REFRESH_COOLDOWN )); then
+  if ! refresh_gate "$AMNEZIA_REFRESH_STAMP" "$AMNEZIA_REFRESH_COOLDOWN"; then
     echo "Amnezia fallback is healthy; Blanc refresh cooldown is active."
     exit 0
   fi
@@ -93,6 +104,11 @@ if ! "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh' >/dev/null 2>&1; then
 fi
 
 echo "Saved nodes are exhausted; refreshing the private Blanc subscription from Keychain."
+if ! refresh_gate "$BLANC_REFRESH_STAMP" "$BLANC_REFRESH_COOLDOWN"; then
+  mark_failure degraded "VPN на роутере не восстановлен: backoff автообновления ещё активен."
+  echo "Blanc refresh backoff is active; no router restart will be attempted." >&2
+  exit 1
+fi
 if "$SCRIPT_DIR/install-blanc-auto.sh" && \
     "${SSH[@]}" '/opt/sbin/blanc-auto test' >/dev/null 2>&1; then
   mark_healthy

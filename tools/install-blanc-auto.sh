@@ -101,7 +101,7 @@ if [ "$mode" = "blanc" ] && /opt/sbin/blanc-auto test >/dev/null 2>&1; then
   esac
 else
   touch /opt/var/lib/blanc-auto/needs-refresh
-  /opt/sbin/blanc-auto force
+  BLANC_AUTO_FRESH_POOL=1 /opt/sbin/blanc-auto force
 fi
 rm -rf "$stage" "$check_dir"
 /opt/sbin/blanc-auto status

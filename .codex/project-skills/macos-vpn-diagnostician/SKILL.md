@@ -13,23 +13,28 @@ Read-only first. Do not kill processes, reset DHCP, change DNS, change routes, o
 
 ## Workflow
 
-1. Capture basic state:
+1. Run the repository preflight first when available:
+   - `tools/macos-vpn-preflight.sh --target-ip <target-ip> --strict`
+   - stop attribution to the router if it reports `STOP`;
+   - record custom-TUN evidence even when `scutil --nc list` does not show a
+     connected named VPN service.
+2. Capture basic state:
    - current Wi-Fi interface and IP
    - default route
    - DNS servers
    - system proxies
    - active VPN-like processes
    - reachable router gateway
-2. Run tiny probes only when useful:
+3. Run tiny probes only when useful:
    - `curl -I https://chatgpt.com`
    - `curl https://api.ipify.org`
    - `nslookup google.com`
-3. If saved diagnostic logs exist, read only the relevant time window and summarize it.
-4. Explain in human language:
+4. If saved diagnostic logs exist, read only the relevant time window and summarize it.
+5. Explain in human language:
    - "what path internet is taking"
    - "what looks broken"
    - "what this does not prove"
-5. Recommend one next action, not a giant checklist.
+6. Recommend one next action, not a giant checklist.
 
 ## Boundaries
 

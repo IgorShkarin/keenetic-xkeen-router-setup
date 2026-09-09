@@ -12,6 +12,9 @@ These scripts are intentionally conservative:
 ## Scripts
 
 - `analyze_access_log.py` - parse sanitized Xray access logs and summarize direct/proxy traffic.
+- `macos-vpn-preflight.sh` - read-only guard for connected desktop VPNs, active
+  IPv4 tunnel interfaces, VPN-like processes, and the Mac route to a target IP.
+  Use `--strict` before attributing an application's behavior to the router.
 - `sanitize_public_release.sh` - scan public release files for likely private VPN/router secrets.
 - `validate_xray_bundle.sh` - validate JSON files and optionally run `xray run -test` if `xray` is installed.
 - `deploy_router.sh` - staged SSH deployment helper with a timestamped router-side backup.

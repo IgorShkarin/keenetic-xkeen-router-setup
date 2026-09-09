@@ -4,12 +4,16 @@ ACTIVE=/opt/etc/xray/configs/04_outbounds.json
 POOL=/opt/etc/xray/blanc-pool
 STATE=/opt/var/lib/blanc-auto
 LOG=/opt/var/log/blanc-auto.log
+AMNEZIA=/opt/etc/xray/amnezia-vless.json
 ENABLED="$STATE/enabled"
 HEALTH="$STATE/health"
 NEEDS_REFRESH="$STATE/needs-refresh"
+MODE="$STATE/mode"
+NEXT_RECOVERY="$STATE/next-blanc-recovery"
 LOCK=/tmp/blanc-auto.lock
 ORDER="ee ch se fi pl lt nl"
 COOLDOWN_SECONDS=1200
+RECOVERY_INTERVAL_SECONDS=900
 
 mkdir -p "$STATE"
 
@@ -25,13 +29,35 @@ write_now() {
     date '+%s' > "$1"
 }
 
+mode_value() {
+    value=$(cat "$MODE" 2>/dev/null || true)
+    case "$value" in
+        blanc|amnezia) printf '%s\n' "$value" ;;
+        *) printf 'blanc\n' ;;
+    esac
+}
+
+set_mode() {
+    printf '%s\n' "$1" > "$MODE"
+}
+
 mark_healthy() {
     printf 'healthy\n' > "$HEALTH"
     printf '0\n' > "$STATE/fails"
     write_now "$STATE/last-check"
     write_now "$STATE/last-ok"
     rm -f "$NEEDS_REFRESH"
+    rm -f "$NEXT_RECOVERY"
+    set_mode blanc
     cp -p "$ACTIVE" "$STATE/last-good.json"
+}
+
+mark_fallback_healthy() {
+    printf 'fallback\n' > "$HEALTH"
+    printf '0\n' > "$STATE/fails"
+    write_now "$STATE/last-check"
+    write_now "$STATE/last-ok"
+    set_mode amnezia
 }
 
 mark_warning() {
@@ -87,7 +113,92 @@ restore_last_good() {
     xkeen -stop >/dev/null 2>&1 || true
     sleep 2
     cp -p "$STATE/last-good.json" "$ACTIVE"
+    if start_xkeen; then
+        set_mode blanc
+        return 0
+    fi
+    return 1
+}
+
+restore_amnezia() {
+    [ -s "$AMNEZIA" ] || return 1
+    xkeen -stop >/dev/null 2>&1 || true
+    sleep 2
+    cp -p "$AMNEZIA" "$ACTIVE"
     start_xkeen
+}
+
+validate_candidate() {
+    candidate=$1
+    check_dir="/tmp/blanc-auto-validate-$$"
+    rm -rf "$check_dir"
+    mkdir -p "$check_dir"
+    cp -a /opt/etc/xray/configs/. "$check_dir/"
+    cp -p "$candidate" "$check_dir/04_outbounds.json"
+    if XRAY_LOCATION_ASSET=/opt/etc/xray/dat xray convert pb \
+        -outpbfile /tmp/blanc-auto-check-$$.pb "$check_dir"/*.json \
+        >/tmp/blanc-auto-check-$$.log 2>&1; then
+        rm -rf "$check_dir" /tmp/blanc-auto-check-$$.pb /tmp/blanc-auto-check-$$.log
+        return 0
+    fi
+    rm -rf "$check_dir"
+    return 1
+}
+
+activate_amnezia() {
+    [ -s "$AMNEZIA" ] || return 1
+    [ "$(mode_value)" = "amnezia" ] || cp -p "$ACTIVE" "$STATE/blanc-last-good.json"
+    if ! validate_candidate "$AMNEZIA"; then
+        log "amnezia config_invalid"
+        return 1
+    fi
+    xkeen -stop >/dev/null 2>&1 || true
+    sleep 2
+    cp -p "$AMNEZIA" "$ACTIVE"
+    if start_xkeen && probe; then
+        touch "$NEEDS_REFRESH"
+        date '+%s' | awk -v add="$RECOVERY_INTERVAL_SECONDS" '{print $1 + add}' > "$NEXT_RECOVERY"
+        mark_fallback_healthy
+        log "amnezia healthy fallback activated"
+        return 0
+    fi
+
+    if [ -f "$STATE/blanc-last-good.json" ]; then
+        xkeen -stop >/dev/null 2>&1 || true
+        sleep 2
+        cp -p "$STATE/blanc-last-good.json" "$ACTIVE"
+        start_xkeen || true
+    fi
+    return 1
+}
+
+try_blanc_recovery() {
+    force=$1
+    now=$(date '+%s')
+    next=$(cat "$NEXT_RECOVERY" 2>/dev/null || echo 0)
+    if [ "$force" != "1" ] && [ "$now" -lt "$next" ]; then
+        return 0
+    fi
+    date '+%s' | awk -v add="$RECOVERY_INTERVAL_SECONDS" '{print $1 + add}' > "$NEXT_RECOVERY"
+
+    current=$(cat "$STATE/current" 2>/dev/null || true)
+    if [ -n "$current" ] && try_country "$current"; then
+        log "blanc recovered country=$current"
+        return 0
+    fi
+    if try_pool 0; then
+        log "blanc recovered from pool"
+        return 0
+    fi
+
+    if restore_amnezia && probe; then
+        mark_fallback_healthy
+        log "blanc recovery failed; amnezia remains healthy"
+        return 0
+    fi
+    mark_degraded
+    log "blanc recovery failed; amnezia restore failed"
+    return 1
 }
 
 try_country() {
@@ -100,9 +211,7 @@ try_country() {
     sleep 2
     cp -p "$candidate" "$ACTIVE"
 
-    if ! XRAY_LOCATION_ASSET=/opt/etc/xray/dat xray convert pb \
-        -outpbfile /tmp/blanc-auto-check.pb /opt/etc/xray/configs/*.json \
-        >/tmp/blanc-auto-check.log 2>&1; then
+    if ! validate_candidate "$candidate"; then
         log "country=$code config_invalid"
         cp -p "$STATE/pre-switch.json" "$ACTIVE"
         start_xkeen || true
@@ -148,6 +257,21 @@ run_check() {
     fi
     trap 'rmdir "$LOCK" 2>/dev/null' EXIT INT TERM
 
+    mode=$(mode_value)
+    if [ "$mode" = "amnezia" ]; then
+        if ! probe; then
+            log "amnezia_probe_failed"
+            if ! restore_amnezia || ! probe; then
+                mark_degraded
+                log "amnezia_failed health=degraded"
+                return 1
+            fi
+            mark_fallback_healthy
+        fi
+        try_blanc_recovery "$force"
+        return $?
+    fi
+
     now=$(date '+%s')
     cooldown=$(cat "$STATE/cooldown-until" 2>/dev/null || echo 0)
     if [ "$force" != "1" ] && [ "$now" -lt "$cooldown" ]; then
@@ -170,14 +294,18 @@ run_check() {
 
     try_pool "$force" && return 0
 
-    if restore_last_good; then
+    if restore_last_good && probe; then
         restored=up
     else
         restored=failed
     fi
-    if [ "$restored" = "up" ] && probe; then
+    if [ "$restored" = "up" ]; then
         mark_healthy
         log "all_candidates_failed restored_last_good=healthy"
+        return 0
+    fi
+
+    if activate_amnezia; then
         return 0
     fi
 
@@ -217,7 +345,20 @@ case "${1:-status}" in
         echo "Blanc auto: OFF (XKeen state unchanged)"
         ;;
     test)
-        if probe; then echo "Blanc VLESS: OK"; else echo "Blanc VLESS: FAIL"; exit 1; fi
+        if probe; then
+            if [ "$(mode_value)" = "amnezia" ]; then
+                echo "Amnezia fallback: OK"
+            else
+                echo "Blanc VLESS: OK"
+            fi
+        else
+            if [ "$(mode_value)" = "amnezia" ]; then
+                echo "Amnezia fallback: FAIL"
+            else
+                echo "Blanc VLESS: FAIL"
+            fi
+            exit 1
+        fi
         ;;
     run)
         run_check 0
@@ -236,8 +377,18 @@ case "${1:-status}" in
         echo "Blanc refresh: not required"
         exit 1
         ;;
+    mode)
+        mode_value
+        ;;
     recover)
-        if restore_last_good && probe; then
+        if [ "$(mode_value)" = "amnezia" ]; then
+            if try_blanc_recovery 1; then
+                echo "Blanc recovery check finished; mode=$(mode_value)"
+            else
+                echo "Blanc recovery failed; mode=$(mode_value)"
+                exit 1
+            fi
+        elif restore_last_good && probe; then
             mark_healthy
             echo "Last-good restored; XKeen: UP"
         else
@@ -249,17 +400,18 @@ case "${1:-status}" in
     status)
         if [ -f "$ENABLED" ]; then enabled=ON; else enabled=OFF; fi
         current=$(cat "$STATE/current" 2>/dev/null || echo unknown)
+        mode=$(mode_value)
         fails=$(cat "$STATE/fails" 2>/dev/null || echo 0)
         health=$(cat "$HEALTH" 2>/dev/null || echo unknown)
         last_check=$(cat "$STATE/last-check" 2>/dev/null || echo never)
         last_ok=$(cat "$STATE/last-ok" 2>/dev/null || echo never)
         if [ -f "$NEEDS_REFRESH" ]; then refresh=required; else refresh=no; fi
         if xkeen_up; then xstatus=UP; else xstatus=DOWN; fi
-        echo "Blanc auto: $enabled; XKeen: $xstatus; country: $current; health: $health; failures: $fails; refresh: $refresh; last_check: $last_check; last_ok: $last_ok"
+        echo "Blanc auto: $enabled; XKeen: $xstatus; mode: $mode; country: $current; health: $health; failures: $fails; refresh: $refresh; last_check: $last_check; last_ok: $last_ok"
         tail -n 5 "$LOG" 2>/dev/null || true
         ;;
     *)
-        echo "Usage: blanc-auto on|off|status|test|run|force|adopt CODE|needs-refresh|recover"
+        echo "Usage: blanc-auto on|off|status|test|run|force|adopt CODE|needs-refresh|mode|recover"
         exit 2
         ;;
 esac

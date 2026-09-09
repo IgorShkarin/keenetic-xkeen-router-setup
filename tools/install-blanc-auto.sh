@@ -85,7 +85,8 @@ printf '*/3 * * * * /opt/sbin/blanc-auto run >/dev/null 2>&1\n' >> "$cron.tmp"
 mv "$cron.tmp" "$cron"
 chmod 600 "$cron"
 current=$(cat /opt/var/lib/blanc-auto/current 2>/dev/null || true)
-if /opt/sbin/blanc-auto test >/dev/null 2>&1; then
+mode=$(/opt/sbin/blanc-auto mode 2>/dev/null || echo blanc)
+if [ "$mode" = "blanc" ] && /opt/sbin/blanc-auto test >/dev/null 2>&1; then
   case "$current" in
     ee|ch|se|fi|pl|lt|nl) /opt/sbin/blanc-auto adopt "$current" ;;
     *)

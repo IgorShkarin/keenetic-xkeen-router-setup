@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+# Точечное исключение только для текущего сертификата express.moex.com.
+spki_hash="QpZAHH2/hqIFM3vGpN+WEWe8MxwXUDp/+VgalT7cefw="
+
+exec /usr/bin/open -na "/Applications/eXpress_Corporate.app" --args \
+  "--ignore-certificate-errors-spki-list=${spki_hash}"

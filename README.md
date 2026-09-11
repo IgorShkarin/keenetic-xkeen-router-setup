@@ -9,6 +9,20 @@ Practical backup and notes for running XKeen + Xray on a Keenetic / Netcraze rou
 
 The setup was tested on **Netcraze / Keenetic Hopper NC-3811** with KeeneticOS 5.x, Entware, XKeen 2.0 Stable, and Xray 26.6.27.
 
+## Latest update — 2026-09-11
+
+Fixed ChatGPT native apps reporting that the service was unavailable in the
+region while the browser still worked. The router was sending `UDP/443`
+directly, allowing iPhone and ChatGPT Classic to use QUIC/HTTP3 outside the
+domain-based Xray rules. The sanitized routing example now blocks `UDP/443`,
+forcing TCP/443 so `chatgpt.com` and `openai.com` are routed through VLESS.
+
+The fix was verified with the official iPhone app and ChatGPT Classic on macOS.
+No VPN credentials, UUIDs, private keys, subscription URLs, or public IPs are
+included in the public repository. See
+[`docs/live-recovery-2026-09-11.md`](docs/live-recovery-2026-09-11.md) for the
+incident details and validation notes.
+
 ## Tested Services
 
 The setup was used for router-level access to:

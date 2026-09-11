@@ -61,7 +61,7 @@ not fully covered by the generated config:
 - Telegram media/CDN IPs observed from Xray access logs
 - Claude / Anthropic
 - ChatGPT / OpenAI web and mobile domains
-- `UDP/443` through `vless-reality` for mobile apps that use QUIC/HTTP3
+- `UDP/443` blocked so mobile apps that use QUIC/HTTP3 fall back to TCP/443
 
 Working public copy:
 

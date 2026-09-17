@@ -7,8 +7,9 @@ STATE_DIR="${BLANC_REFRESH_STATE_DIR:-${HOME}/Library/Application Support/Blanc 
 STATE_FILE="$STATE_DIR/state"
 AMNEZIA_REFRESH_STAMP="$STATE_DIR/amnezia-last-refresh"
 AMNEZIA_REFRESH_COOLDOWN=1800
-BLANC_REFRESH_STAMP="$STATE_DIR/blanc-last-refresh"
-BLANC_REFRESH_COOLDOWN=3600
+BLANC_REFRESH_ATTEMPT_STAMP="$STATE_DIR/blanc-last-refresh-attempt"
+BLANC_REFRESH_SUCCESS_STAMP="$STATE_DIR/blanc-last-refresh"
+BLANC_REFRESH_RETRY_COOLDOWN=300
 SSH=(ssh -o BatchMode=yes -o ConnectTimeout=6 "root@$ROUTER")
 
 mkdir -p "$STATE_DIR"
@@ -48,8 +49,12 @@ refresh_gate() {
   if [[ "$last" =~ ^[0-9]+$ ]] && (( now - last < cooldown )); then
     return 1
   fi
-  printf '%s\n' "$now" > "$stamp_file"
   return 0
+}
+
+mark_refresh_attempt() {
+  local stamp_file="$1"
+  date +%s > "$stamp_file"
 }
 
 if ! "${SSH[@]}" true >/dev/null 2>&1; then
@@ -65,7 +70,7 @@ if [[ "$mode" == "amnezia" ]] && "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh
     exit 0
   fi
 
-  printf '%s\n' "$now" > "$AMNEZIA_REFRESH_STAMP"
+  mark_refresh_attempt "$AMNEZIA_REFRESH_STAMP"
   echo "Amnezia fallback is active; refreshing the Blanc pool in the background."
   if "$SCRIPT_DIR/install-blanc-auto.sh"; then
     mode_after="$("${SSH[@]}" '/opt/sbin/blanc-auto mode' 2>/dev/null || echo amnezia)"
@@ -104,13 +109,15 @@ if ! "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh' >/dev/null 2>&1; then
 fi
 
 echo "Saved nodes are exhausted; refreshing the private Blanc subscription from Keychain."
-if ! refresh_gate "$BLANC_REFRESH_STAMP" "$BLANC_REFRESH_COOLDOWN"; then
+if ! refresh_gate "$BLANC_REFRESH_ATTEMPT_STAMP" "$BLANC_REFRESH_RETRY_COOLDOWN"; then
   mark_failure degraded "VPN на роутере не восстановлен: backoff автообновления ещё активен."
-  echo "Blanc refresh backoff is active; no router restart will be attempted." >&2
+  echo "Blanc refresh retry backoff is active; no router restart will be attempted." >&2
   exit 1
 fi
+mark_refresh_attempt "$BLANC_REFRESH_ATTEMPT_STAMP"
 if "$SCRIPT_DIR/install-blanc-auto.sh" && \
     "${SSH[@]}" '/opt/sbin/blanc-auto test' >/dev/null 2>&1; then
+  date +%s > "$BLANC_REFRESH_SUCCESS_STAMP"
   mark_healthy
   notify "VPN автоматически восстановлен после обновления подписки Blanc."
   echo "Router VLESS recovered after subscription refresh."

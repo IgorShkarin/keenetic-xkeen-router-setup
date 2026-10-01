@@ -46,7 +46,7 @@ cap_live() {
 sample() {
     {
         printf 'time=%s epoch=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$now"
-        for key in mode fails recovery-successes last-recovery last-check; do
+        for key in mode fails recovery-successes last-recovery last-check last-fallback active-signature; do
             printf '%s=' "$key"; cat "$STATE/$key" 2>/dev/null || printf 'unknown\n'
         done
         printf 'load='; cat /proc/loadavg 2>/dev/null
@@ -54,6 +54,7 @@ sample() {
     } > "$RING/$minute.state"
     tail -c 49152 "$ROOT/var/log/xray/error.log" > "$RING/$minute.error" 2>/dev/null || :
     tail -c 16384 "$ROOT/var/log/xray/access.log" > "$RING/$minute.access" 2>/dev/null || :
+    tail -c 8192 "$STATE/probe.log" > "$RING/$minute.probe" 2>/dev/null || :
     cap_live "$ROOT/var/log/xray/error.log" 262144
     cap_live "$ROOT/var/log/xray/access.log" 131072
     prune

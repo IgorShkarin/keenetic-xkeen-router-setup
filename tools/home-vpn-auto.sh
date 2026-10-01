@@ -19,6 +19,7 @@ number() {
 cleanup() {
     if [ -n "${probe_pid:-}" ]; then kill "$probe_pid" 2>/dev/null; wait "$probe_pid" 2>/dev/null; fi
     if [ -f "$ACTIVE" ]; then sha256sum "$ACTIVE" | awk '{print $1}' > "$STATE/active-signature"; fi
+    "$DIAG" sample
     rm -f "$STATE/http-error.$$" "$STATE/trace.$$"
     rmdir "$LOCK" 2>/dev/null || :
 }

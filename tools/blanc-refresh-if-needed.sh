@@ -58,11 +58,16 @@ mark_refresh_attempt() {
 }
 
 check_personal_certificate() {
-  local stamp="$STATE_DIR/certificate-last-check" expiry expiry_epoch remaining previous
+  local stamp="$STATE_DIR/certificate-last-check" expiry expiry_epoch remaining previous server_host certificate_name
+  server_host="${HOME_VPN_SSH_HOST:-$(cat "$STATE_DIR/home-vpn-server-host" 2>/dev/null || true)}"
+  [[ -n "$server_host" ]] || return 0
+  [[ "$server_host" != *[!a-zA-Z0-9.@_-]* ]] || return 0
+  certificate_name="${HOME_VPN_CERT_NAME:-${server_host#*@}}"
+  [[ "$certificate_name" != *[!a-zA-Z0-9._-]* ]] || return 0
   refresh_gate "$stamp" 3600 || return 0
   mark_refresh_attempt "$stamp"
-  expiry="$(ssh -o BatchMode=yes -o ConnectTimeout=6 root@185.234.9.26 \
-    'openssl x509 -in /etc/letsencrypt/live/185.234.9.26/fullchain.pem -noout -enddate' \
+  expiry="$(ssh -o BatchMode=yes -o ConnectTimeout=6 "$server_host" \
+    "openssl x509 -in /etc/letsencrypt/live/$certificate_name/fullchain.pem -noout -enddate" \
     2>/dev/null)" || { echo "Certificate expiry check unavailable."; return 0; }
   expiry_epoch="$(TZ=UTC date -j -f '%b %e %T %Y %Z' "${expiry#notAfter=}" +%s 2>/dev/null)" || return 0
   remaining=$((expiry_epoch - $(date +%s)))

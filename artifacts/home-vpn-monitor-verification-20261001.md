@@ -13,7 +13,7 @@ Backup перед последним обновлением: `/opt/var/backups/h
 ## Проверено на живом роутере
 
 - 22:18:10 — `switch_success target=home reason=private_recovered`.
-  Подтверждены успешные ответы YouTube/Cloudflare и IP `185.234.9.26`.
+  Подтверждены успешные ответы YouTube/Cloudflare и IP `PERSONAL_VPS_IP`.
   Сохранён архив `20261001T191803Z-21945.log.gz`, 55 876 байт.
 - 22:19:01 — следующий цикл основного VPN: HTTP 204/200, тот же IP.
 - 22:22:23 — `switch_success target=fallback reason=consecutive_primary_failures`.
@@ -53,6 +53,6 @@ WebSocket с кодом 1006, затем HTTP 403 при переподключ�
 Причина ответа 403 отдельно не установлена. Дополнительные ошибки подключения
 к `gitlab.com` в приложении относятся к другому SSH-host и сюда не включены.
 
-`iPhone-Igor` подтверждён DHCP/association/ARP как `192.168.1.33`. В журнале
+`iPhone-Igor` подтверждён DHCP/association/ARP как `IPHONE_LAN_IP`. В журнале
 также есть отдельные Wi-Fi-переподключения, но они не объясняют автоматически
 описанный пользователем сбой только Codex. Настройки Wi-Fi и Codex не менялись.

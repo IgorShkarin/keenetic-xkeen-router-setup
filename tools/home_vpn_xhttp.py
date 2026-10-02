@@ -19,7 +19,7 @@ def convert(config, role):
         config["log"] = {"loglevel": "warning"}
     elif role == "client":
         candidates = [o for o in config["outbounds"] if o.get("protocol") == "vless"
-                      and o["settings"]["vnext"][0]["address"] == "185.234.9.26"]
+                      and o.get("tag") == "vless-reality"]
         if len(candidates) != 1:
             raise ValueError("Expected exactly one personal VPS outbound")
         outbound = candidates[0]
@@ -28,7 +28,7 @@ def convert(config, role):
             user.pop("flow", None)
         outbound["streamSettings"] = {
             "network": "xhttp", "security": "tls",
-            "tlsSettings": {"serverName": "185.234.9.26", "allowInsecure": False,
+            "tlsSettings": {"serverName": outbound["settings"]["vnext"][0]["address"], "allowInsecure": False,
                             "alpn": ["http/1.1"]},
             "xhttpSettings": {"path": PATH, "mode": "packet-up"}
         }

@@ -11,6 +11,13 @@ These scripts are intentionally conservative:
 
 ## Scripts
 
+- `home-vpn-priority.sh` - verified explicit priority, local Routing API switching,
+  recovery checks, and bounded incident snapshots.
+- `awg-socks/` - tested loopback-only TCP SOCKS bridge using the official AmneziaWG
+  3.x userspace stack; no kernel interface or system route changes.
+- `home-vpn-amnezia.sh` and `S98home-amnezia` - bounded-log supervision and Entware
+  startup for the AWG bridge.
+
 - `analyze_access_log.py` - parse sanitized Xray access logs and summarize direct/proxy traffic.
 - `macos-vpn-preflight.sh` - read-only guard for connected desktop VPNs, active
   IPv4 tunnel interfaces, VPN-like processes, and the Mac route to a target IP.

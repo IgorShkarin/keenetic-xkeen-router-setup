@@ -8,7 +8,7 @@ ACTIVE=$ROOT/etc/xray/configs/04_outbounds.json
 PERSONAL=$ROOT/etc/xray/home-vpn.json
 DIAG=$ROOT/sbin/home-vpn-log
 LOCK=$TMP/home-vpn-auto.lock
-EXPECTED_IP=185.234.9.26
+EXPECTED_IP=${HOME_VPN_EXPECTED_IP:-$(cat "$STATE/expected-egress" 2>/dev/null)}
 if [ -f "$STATE/api-enabled" ]; then
     exec "$ROOT/sbin/home-vpn-priority" "$@"
 fi

@@ -55,6 +55,7 @@ sample() {
     tail -c 49152 "$ROOT/var/log/xray/error.log" > "$RING/$minute.error" 2>/dev/null || :
     tail -c 16384 "$ROOT/var/log/xray/access.log" > "$RING/$minute.access" 2>/dev/null || :
     tail -c 8192 "$STATE/probe.log" > "$RING/$minute.probe" 2>/dev/null || :
+    tail -c 4096 "$ROOT/var/log/home-vpn-amnezia.log" > "$RING/$minute.amnezia" 2>/dev/null || :
     cap_live "$ROOT/var/log/xray/error.log" 262144
     cap_live "$ROOT/var/log/xray/access.log" 131072
     prune

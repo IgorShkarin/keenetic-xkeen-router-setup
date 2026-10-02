@@ -4,6 +4,8 @@ set -eu
 PATH=/opt/bin:/opt/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 stage=/tmp/priority-stage
 state=/opt/var/lib/home-vpn-auto
+expected_ip=${HOME_VPN_EXPECTED_IP:-$(cat "$state/expected-egress" 2>/dev/null)}
+[ -n "$expected_ip" ] || { echo "Private expected-egress is required"; exit 1; }
 lock=/tmp/home-vpn-auto.lock
 if [ -d "$lock" ]; then
     [ "$(cat "$lock/owner" 2>/dev/null)" = codex-hardening ] || exit 1
@@ -51,7 +53,7 @@ if [ "$rc" = 0 ] && xray api bo --server=127.0.0.1:10085 -b home-priority vless-
     code=$(curl --proxy socks5h://127.0.0.1:10809 -sS --connect-timeout 8 --max-time 12 \
         -o /dev/null -w '%{http_code}' https://www.youtube.com/) || code=failed
 else ip=failed; code=failed; fi
-if [ "$ip" = 185.234.9.26 ] && [ "$code" = 200 ]; then
+if [ "$ip" = "$expected_ip" ] && [ "$code" = 200 ]; then
     touch "$state/api-enabled"
     home-vpn-log result "$(cat "$backup/incident-path")" "priority_api_installed ip=$ip youtube=$code backup=$backup"
     echo "Installed with backup=$backup; egress=$ip youtube=$code"

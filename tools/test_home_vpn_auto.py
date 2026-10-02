@@ -22,6 +22,7 @@ class RouterFixture(unittest.TestCase):
         for path in ("sbin", "etc/xray/configs", "var/lib/home-vpn-auto", "var/lib/blanc-auto", "var/log/xray"):
             (self.root / path).mkdir(parents=True)
         self.state = self.root / "var/lib/home-vpn-auto"
+        (self.state / "expected-egress").write_text("203.0.113.10\n")
         self.active = self.root / "etc/xray/configs/04_outbounds.json"
         self.active.write_text("home\n")
         (self.root / "etc/xray/home-vpn.json").write_text("home\n")
@@ -55,7 +56,7 @@ health=os.environ.get('PROBE_HEALTH' if port=='10818' else 'HOME_HEALTH','up') i
 if health=='down' or (health=='partial' and 'youtube' in a[-1]):
  print('000 0.000 0.000 12.000',end=''); print('curl: (28) Connection timed out',file=sys.stderr); sys.exit(28)
 out=a[a.index('-o')+1]
-ip='185.234.9.26' if port=='10818' or active=='home' else '203.0.113.10'
+ip='203.0.113.10' if port=='10818' or active=='home' else '203.0.113.10'
 if os.environ.get('WRONG_IP')=='yes': ip='203.0.113.99'
 if out!='/dev/null': Path(out).write_text('ip='+ip+'\\n')
 print(('204' if 'youtube' in a[-1] else '200')+' 0.01 0.02 0.03',end='')

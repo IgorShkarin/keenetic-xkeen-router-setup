@@ -6,13 +6,14 @@ TMP=${HOME_VPN_TMP:-/tmp}
 STATE=$ROOT/var/lib/home-vpn-auto
 DIAG=$ROOT/sbin/home-vpn-log
 API=127.0.0.1:10085
+EXPECTED_IP=${HOME_VPN_EXPECTED_IP:-$(cat "$STATE/expected-egress" 2>/dev/null)}
 LOCK=$TMP/home-vpn-auto.lock
 umask 077
 mkdir -p "$STATE"
 event() { "$DIAG" event "$*"; }
 number() { value=$(cat "$STATE/$1" 2>/dev/null); case "$value" in ''|*[!0-9]*) echo 0;; *) echo "$value";; esac; }
 port_for() { case "$1" in vless-reality) echo 10821;; home-h1-reserve) echo 10824;; reserve-blanc) echo 10822;; reserve-amnezia) echo 10823;; *) return 1;; esac; }
-expected_for() { case "$1" in vless-reality|home-h1-reserve) echo 185.234.9.26;; esac; }
+expected_for() { case "$1" in vless-reality|home-h1-reserve) echo "$EXPECTED_IP";; esac; }
 healthy() {
     label=$1; port=$2; expected=$3; strict=${4:-no}
     yt=0; cf=0; ip=unknown
@@ -61,6 +62,7 @@ status)
 run|recover) ;;
 *) exit 2;;
 esac
+[ -n "$EXPECTED_IP" ] || { event missing_private_expected_egress; exit 1; }
 mkdir "$LOCK" 2>/dev/null || exit 0
 cleanup() { "$DIAG" sample; rm -f "$STATE/http-error.$$" "$STATE/trace.$$"; rmdir "$LOCK" 2>/dev/null || :; }
 trap cleanup EXIT INT TERM
@@ -91,7 +93,7 @@ if [ "$selected" != vless-reality ]; then
     [ $((now - last)) -ge 55 ] || exit 0
     [ $((now - last)) -le 180 ] || echo 0 > "$STATE/recovery-successes"
     echo "$now" > "$STATE/last-recovery"
-    if healthy primary-recovery 10821 185.234.9.26 yes; then
+    if healthy primary-recovery 10821 "$EXPECTED_IP" yes; then
         successes=$(number recovery-successes); successes=$((successes + 1)); echo "$successes" > "$STATE/recovery-successes"
         [ "$successes" -lt 3 ] || [ $((now - $(number last-fallback))) -lt 180 ] || switch_to vless-reality stable_primary_recovery
     else echo 0 > "$STATE/recovery-successes"; fi

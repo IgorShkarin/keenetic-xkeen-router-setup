@@ -13,9 +13,10 @@ def build(home, blanc, amnezia, routing, home_h1=None):
         outbounds.append(fallback)
     for name, profile in [("blanc", blanc), ("amnezia", amnezia)]:
         mapping = {o["tag"]: "reserve-" + name + ("" if o["tag"] == "vless-reality"
-                   else "-" + o["tag"]) for o in profile["outbounds"] if o["protocol"] == "vless"}
+                   else "-" + o["tag"]) for o in profile["outbounds"]
+                   if o["protocol"] == "vless" or o["tag"] == "vless-reality"}
         for original in profile["outbounds"]:
-            if original["protocol"] != "vless":
+            if original["protocol"] != "vless" and original["tag"] != "vless-reality":
                 continue
             outbound = copy.deepcopy(original)
             outbound["tag"] = mapping[original["tag"]]

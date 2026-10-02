@@ -4,6 +4,8 @@ set -eu
 PATH=/opt/bin:/opt/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 lock=/tmp/home-vpn-auto.lock
 state=/opt/var/lib/home-vpn-auto
+expected_ip=${HOME_VPN_EXPECTED_IP:-$(cat "$state/expected-egress" 2>/dev/null)}
+[ -n "$expected_ip" ] || { echo "Private expected-egress is required"; exit 1; }
 backup=/opt/var/backups/home-vpn-xhttp-20261002
 attempt=0
 until mkdir "$lock" 2>/dev/null; do
@@ -31,7 +33,7 @@ ip=$(curl --proxy socks5h://127.0.0.1:10809 -sS --connect-timeout 8 --max-time 1
     https://www.cloudflare.com/cdn-cgi/trace | sed -n 's/^ip=//p') || ip=failed
 code=$(curl --proxy socks5h://127.0.0.1:10809 -sS --connect-timeout 8 --max-time 12 \
     -o /dev/null -w '%{http_code}' https://www.youtube.com/) || code=failed
-if [ "$restart_rc" = 0 ] && [ "$ip" = 185.234.9.26 ] && [ "$code" = 200 ]; then
+if [ "$restart_rc" = 0 ] && [ "$ip" = "$expected_ip" ] && [ "$code" = 200 ]; then
     echo home > "$state/mode"
     echo 0 > "$state/fails"
     echo 0 > "$state/recovery-successes"

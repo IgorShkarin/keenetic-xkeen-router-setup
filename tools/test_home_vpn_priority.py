@@ -32,7 +32,7 @@ if port=='10809':tag=(s/'api-target').read_text()
 key={{'vless-reality':'PRIMARY_HEALTH','home-h1-reserve':'H1_HEALTH','reserve-blanc':'BLANC_HEALTH','reserve-amnezia':'AMNEZIA_HEALTH'}}[tag]
 if os.environ[key]=='down' or (port=='10809' and tag=='reserve-blanc' and os.environ.get('POST_FAIL')=='yes'):
  print('000',end='');sys.exit(28)
-out=a[a.index('-o')+1];ip='185.234.9.26' if tag in ['vless-reality','home-h1-reserve'] else '203.0.113.10'
+out=a[a.index('-o')+1];ip='203.0.113.10' if tag in ['vless-reality','home-h1-reserve'] else '203.0.113.10'
 if out!='/dev/null':Path(out).write_text('ip='+ip+'\\n')
 print('204' if 'youtube' in a[-1] else '200',end='')
 ''')
@@ -97,6 +97,15 @@ for name in list(RouterFixture.__dict__):
 
 
 class ConfigChecks(unittest.TestCase):
+    def test_amnezia_socks_bridge_is_preserved(self):
+        home = {'outbounds': [{'tag': 'vless-reality', 'protocol': 'vless'}]}
+        awg = {'outbounds': [{'tag': 'vless-reality', 'protocol': 'socks',
+                             'settings': {'servers': [{'address': '127.0.0.1', 'port': 10932}]}}]}
+        result = build(home, home, awg, {'routing': {'rules': []}})
+        outbound = next(o for o in result['04_outbounds.json']['outbounds'] if o['tag'] == 'reserve-amnezia')
+        self.assertEqual(outbound['protocol'], 'socks')
+        self.assertEqual(outbound['settings']['servers'][0]['port'], 10932)
+
     def test_relay_references_and_direct_rules_are_preserved(self):
         primary = {'outbounds': [{'tag': 'vless-reality', 'protocol': 'vless'},
                                  {'tag': 'direct', 'protocol': 'freedom'}]}

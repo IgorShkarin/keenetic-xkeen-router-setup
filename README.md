@@ -9,7 +9,30 @@ Practical backup and notes for running XKeen + Xray on a Keenetic / Netcraze rou
 
 The setup was tested on **Netcraze / Keenetic Hopper NC-3811** with KeeneticOS 5.x, Entware, XKeen 2.0 Stable, and Xray 26.6.27.
 
-## Latest update — 2026-09-11
+## Latest update — 2026-10-02
+
+Added explicit priority recovery: personal XHTTP H2, personal HTTPS H1,
+Blanc, then AmneziaWG. Only verified routes are selected; healthy connections
+survive balancer changes without an Xray restart. The primary returns after
+three successful minute checks. Bounded diagnostics preserve the preceding
+15 minutes around a switch, with eight incident archives and an 8 MiB cap.
+
+An older Blanc refresh agent was overriding personal VPN settings; it now
+refreshes only the private pool. AmneziaWG 3.x runs through the official
+userspace network stack and a loopback SOCKS bridge, without changing router
+firmware, system routes, or DNS. Both independent reserves were verified
+through the production balancer. Existing client connections stay established;
+a connection broken by the upstream still needs a client retry.
+
+See [monitor and recovery setup](HOME_VPN_MONITOR.md),
+[AWG bridge build and deployment](tools/awg-socks/README.md),
+[sourced reliability research](VPN_RELIABILITY_RESEARCH.md), and
+[verification results](artifacts/home-vpn-hardening-20261002.md).
+Server addresses and credentials belong in private configuration files.
+Optional local credential Git backups must have no remote and stay outside
+the public repository; `private-backups/` is ignored.
+
+## Previous update — 2026-09-11
 
 Fixed ChatGPT native apps reporting that the service was unavailable in the
 region while the browser still worked. The router was sending `UDP/443`

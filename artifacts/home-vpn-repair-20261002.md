@@ -12,7 +12,7 @@ Observed 05:37–05:57 MSK:
 - Isolated firefox, iOS, Safari, Firefox 120, TLS fragmentation and port
   18443 did not provide repeatable recovery. Fragmentation had one successful
   YouTube check followed by timeouts; it was not deployed.
-- Direct verified HTTPS to 185.234.9.26:443 returned in about 0.2 seconds.
+- Direct verified HTTPS to PERSONAL_VPS_IP:443 returned in about 0.2 seconds.
 
 Applied:
 
@@ -36,10 +36,10 @@ Validation:
 
 - Full candidate confdir and independent probe passed Xray validation.
 - Five initial paired checks passed. Then 20 fresh pairs over several minutes
-  all returned egress 185.234.9.26 and full YouTube page HTTP 200, zero failures.
+  all returned egress PERSONAL_VPS_IP and full YouTube page HTTP 200, zero failures.
 - Production postcheck returned the same egress and YouTube 200.
 - Real Mac request bound to Wi-Fi en0 returned YouTube 200 in 0.68 seconds,
-  local IP 192.168.1.57, remote 142.251.155.4. Fresh Xray access entry matched
+  local IP CLIENT_LAN_IP, remote 142.251.155.4. Fresh Xray access entry matched
   this exact destination through `[redirect -> vless-reality]`. The retained
   tag name now refers to XHTTP; the compatibility tag was deliberately kept.
 - Cloudflare from that Mac followed a direct routing rule, so its residential

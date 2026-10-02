@@ -1,0 +1,6 @@
+#!/bin/sh
+case "$1" in
+start|restart) /opt/sbin/home-vpn-amnezia ensure;;
+stop) /opt/sbin/home-vpn-amnezia stop;;
+*) /opt/sbin/home-vpn-amnezia status;;
+esac

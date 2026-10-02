@@ -3,6 +3,21 @@
 Приоритет: личный VPS AlexHost → действующая цепочка Blanc → Amnezia.
 Менеджер `/opt/sbin/home-vpn-auto` запускается существующим cron раз в минуту.
 
+С 2 октября домашний маршрут использует VLESS/XHTTP через HTTPS 443,
+nginx → `127.0.0.1:18444` → отдельный `home-vpn-xhttp.service`.
+TLS-сертификат IP проверяется, `allowInsecure=false`. Старый Reality 8443
+сохранён для существующих прямых клиентов. Личные `home-vpn.json` и
+`home-vpn-probe.json` используют одинаковый новый транспорт; routing не менялся.
+Короткий IP-сертификат продлевает существующий `signal-cert-renew.timer`
+с проверкой и reload nginx. Логи HTTP-пути VPN отключены, сервис пишет
+только предупреждения в системный journal.
+
+Приватные backup: роутер `/opt/var/backups/home-vpn-xhttp-20261002/`,
+VPS `/root/vpn-repair-20261002/`. Проверяемые шаблоны без UUID:
+`tools/home_vpn_xhttp.py`, `tools/home-vpn-xhttp.service`,
+`tools/home-vpn-xhttp.nginx.conf`. Конвертер выводит секретный JSON;
+его вывод сохранять только приватно на соответствующем устройстве.
+
 Проверки используют SOCKS 10809, принудительно направленный через VPN:
 YouTube `generate_204` и Cloudflare trace. В журнале есть HTTP-код,
 код ошибки curl, время TCP/TLS/всего запроса и выходной IP.

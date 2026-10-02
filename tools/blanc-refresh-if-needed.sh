@@ -63,6 +63,20 @@ if ! "${SSH[@]}" true >/dev/null 2>&1; then
   exit 1
 fi
 
+# The personal-VPN manager owns active routing. Refresh reserves only; never
+# invoke the legacy selector or treat a healthy primary as healthy Blanc.
+if "${SSH[@]}" 'test -x /opt/sbin/home-vpn-auto' >/dev/null 2>&1; then
+  if "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh' >/dev/null 2>&1 && \
+      refresh_gate "$BLANC_REFRESH_ATTEMPT_STAMP" "$BLANC_REFRESH_RETRY_COOLDOWN"; then
+    mark_refresh_attempt "$BLANC_REFRESH_ATTEMPT_STAMP"
+    "$SCRIPT_DIR/install-blanc-auto.sh"
+    echo "Reserve pool refreshed; personal VPN routing preserved."
+  else
+    echo "Personal VPN manager owns routing; no legacy failover attempted."
+  fi
+  exit 0
+fi
+
 mode="$("${SSH[@]}" '/opt/sbin/blanc-auto mode' 2>/dev/null || echo blanc)"
 if [[ "$mode" == "amnezia" ]] && "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh' >/dev/null 2>&1; then
   if ! refresh_gate "$AMNEZIA_REFRESH_STAMP" "$AMNEZIA_REFRESH_COOLDOWN"; then

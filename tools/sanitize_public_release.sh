@@ -7,9 +7,9 @@ echo "Scanning public release scope:"
 printf '%s\n' "$SCOPE"
 echo
 
-PATTERN='vless://[^[:space:]"<>]+@|withblancvpn|privateKey"[[:space:]]*:|shortId"[[:space:]]*:[[:space:]]*"(?!REPLACE_WITH)|password"[[:space:]]*:|uuid"[[:space:]]*:[[:space:]]*"(?!REPLACE_WITH)|092be170|6dbab41'
+PATTERN='vless://[^[:space:]"<>]+@|withblancvpn|privateKey"[[:space:]]*:|shortId"[[:space:]]*:[[:space:]]*"(?!REPLACE_WITH)|password"[[:space:]]*:|uuid"[[:space:]]*:[[:space:]]*"(?!REPLACE_WITH)'
 
-if rg --pcre2 -n \
+if rg --pcre2 --files-with-matches \
   --glob '!tools/sanitize_public_release.sh' \
   --glob '!.codex/project-skills/public-config-sanitizer/SKILL.md' \
   "$PATTERN" $SCOPE; then

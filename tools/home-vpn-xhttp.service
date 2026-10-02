@@ -1,0 +1,17 @@
+[Unit]
+Description=Personal VPN over verified HTTPS
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+User=nobody
+NoNewPrivileges=true
+ExecStart=/usr/local/bin/xray run -config /usr/local/etc/xray/home-xhttp.json
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=100000
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

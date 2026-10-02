@@ -57,10 +57,49 @@ mark_refresh_attempt() {
   date +%s > "$stamp_file"
 }
 
+check_personal_certificate() {
+  local stamp="$STATE_DIR/certificate-last-check" expiry expiry_epoch remaining previous server_host certificate_name
+  server_host="${HOME_VPN_SSH_HOST:-$(cat "$STATE_DIR/home-vpn-server-host" 2>/dev/null || true)}"
+  [[ -n "$server_host" ]] || return 0
+  [[ "$server_host" != *[!a-zA-Z0-9.@_-]* ]] || return 0
+  certificate_name="${HOME_VPN_CERT_NAME:-${server_host#*@}}"
+  [[ "$certificate_name" != *[!a-zA-Z0-9._-]* ]] || return 0
+  refresh_gate "$stamp" 3600 || return 0
+  mark_refresh_attempt "$stamp"
+  expiry="$(ssh -o BatchMode=yes -o ConnectTimeout=6 "$server_host" \
+    "openssl x509 -in /etc/letsencrypt/live/$certificate_name/fullchain.pem -noout -enddate" \
+    2>/dev/null)" || { echo "Certificate expiry check unavailable."; return 0; }
+  expiry_epoch="$(TZ=UTC date -j -f '%b %e %T %Y %Z' "${expiry#notAfter=}" +%s 2>/dev/null)" || return 0
+  remaining=$((expiry_epoch - $(date +%s)))
+  previous="$(cat "$STATE_DIR/certificate-health" 2>/dev/null || true)"
+  if (( remaining < 172800 )); then
+    printf 'expiry-warning\n' > "$STATE_DIR/certificate-health"
+    [[ "$previous" == expiry-warning ]] || notify "Сертификат нашего VPN истекает менее чем через 48 часов; нужно проверить продление."
+  else
+    printf 'healthy\n' > "$STATE_DIR/certificate-health"
+  fi
+  echo "Personal VPN certificate remaining_seconds=$remaining"
+}
+
 if ! "${SSH[@]}" true >/dev/null 2>&1; then
   echo "Router is unreachable over SSH."
   mark_failure router-unreachable "Роутер недоступен по SSH; автоматическая проверка VPN не выполнена."
   exit 1
+fi
+
+# The personal-VPN manager owns active routing. Refresh reserves only; never
+# invoke the legacy selector or treat a healthy primary as healthy Blanc.
+if "${SSH[@]}" 'test -x /opt/sbin/home-vpn-auto' >/dev/null 2>&1; then
+  check_personal_certificate
+  if "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh' >/dev/null 2>&1 && \
+      refresh_gate "$BLANC_REFRESH_ATTEMPT_STAMP" "$BLANC_REFRESH_RETRY_COOLDOWN"; then
+    mark_refresh_attempt "$BLANC_REFRESH_ATTEMPT_STAMP"
+    "$SCRIPT_DIR/install-blanc-auto.sh"
+    echo "Reserve pool refreshed; personal VPN routing preserved."
+  else
+    echo "Personal VPN manager owns routing; no legacy failover attempted."
+  fi
+  exit 0
 fi
 
 mode="$("${SSH[@]}" '/opt/sbin/blanc-auto mode' 2>/dev/null || echo blanc)"

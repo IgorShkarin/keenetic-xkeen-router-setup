@@ -59,6 +59,18 @@ stage=$1
 stamp=$2
 backup=/opt/var/backups/blanc-auto-install-$stamp
 check_dir=/tmp/blanc-auto-validate-$stamp
+priority=0
+if [ -x /opt/sbin/home-vpn-auto ]; then
+  priority=1
+  tries=0
+  until mkdir /tmp/home-vpn-auto.lock 2>/dev/null; do
+    tries=$((tries + 1))
+    [ "$tries" -lt 90 ] || { echo 'Personal VPN manager busy; no changes'; exit 1; }
+    sleep 1
+  done
+  trap 'rmdir /tmp/home-vpn-auto.lock 2>/dev/null || true; rm -rf "$stage" "$check_dir"' EXIT
+  [ ! -d /tmp/blanc-auto.lock ] || { echo 'Reserve selector busy; no changes'; exit 1; }
+fi
 mkdir -p "$backup" "$check_dir" /opt/etc/xray/blanc-pool /opt/var/lib/blanc-auto
 cp -a /opt/etc/xray/blanc-pool "$backup/" 2>/dev/null || true
 cp -a /opt/var/lib/blanc-auto "$backup/" 2>/dev/null || true
@@ -72,6 +84,16 @@ for candidate in "$stage"/*.json; do
     -outpbfile /tmp/blanc-auto-install-check.pb "$check_dir"/*.json \
     >/tmp/blanc-auto-install-check.log 2>&1
 done
+if [ "$priority" = 1 ]; then
+  # Update only the private pool. Preserve the active outbound, route manager,
+  # cron, current mode and disabled legacy selector. New nodes need health proof.
+  for code in ee ch se fi pl lt nl; do rm -f "/opt/etc/xray/blanc-pool/$code.json"; done
+  cp -p "$stage"/*.json /opt/etc/xray/blanc-pool/
+  rm -f /opt/var/lib/blanc-auto/enabled
+  date +%s > /opt/var/lib/blanc-auto/pool-updated
+  echo "Reserve pool updated without restart; backup=$backup"
+  exit 0
+fi
 cp "$stage/blanc-auto" /opt/sbin/blanc-auto
 chmod 755 /opt/sbin/blanc-auto
 for code in ee ch se fi pl lt nl; do

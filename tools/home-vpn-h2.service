@@ -1,0 +1,17 @@
+[Unit]
+Description=Personal VPN HTTPS HTTP2 stream-up
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+User=nobody
+NoNewPrivileges=true
+ExecStart=/usr/local/bin/xray run -config /usr/local/etc/xray/home-h2.json
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=100000
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

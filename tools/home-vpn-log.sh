@@ -46,7 +46,7 @@ cap_live() {
 sample() {
     {
         printf 'time=%s epoch=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$now"
-        for key in mode fails recovery-successes last-recovery last-check last-fallback active-signature; do
+        for key in mode selected health fails recovery-successes last-recovery last-check last-fallback last-reserve-check home-h1-reserve reserve-blanc reserve-amnezia active-signature; do
             printf '%s=' "$key"; cat "$STATE/$key" 2>/dev/null || printf 'unknown\n'
         done
         printf 'load='; cat /proc/loadavg 2>/dev/null

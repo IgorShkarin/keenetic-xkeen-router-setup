@@ -9,6 +9,9 @@ PERSONAL=$ROOT/etc/xray/home-vpn.json
 DIAG=$ROOT/sbin/home-vpn-log
 LOCK=$TMP/home-vpn-auto.lock
 EXPECTED_IP=185.234.9.26
+if [ -f "$STATE/api-enabled" ]; then
+    exec "$ROOT/sbin/home-vpn-priority" "$@"
+fi
 umask 077
 mkdir -p "$STATE"
 event() { "$DIAG" event "$*"; }

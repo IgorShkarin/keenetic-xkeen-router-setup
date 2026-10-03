@@ -30,9 +30,12 @@ These scripts are intentionally conservative:
 - `blanc-auto-router.sh` - low-load router-side health checks, failover, explicit
   degraded state, and a `needs-refresh` signal when the saved pool is exhausted.
 - `install-blanc-auto.sh` - securely refresh and validate the router country pool
-  without exposing the subscription URL in process arguments.
+  without exposing the subscription URL in process arguments; with the personal
+  VPN manager active, probe new nodes in isolation before replacing only the
+  `reserve-blanc` outbound and verify that the selected route still works.
 - `blanc-refresh-if-needed.sh` - macOS recovery guard: use the saved router pool
-  first, then refresh the private subscription only after sustained failure.
+  health to refresh the private subscription when the Blanc reserve is down,
+  with retry cooldowns and no repeated downloads after a verified refresh.
 - `install-blanc-refresh-agent.sh` - install the five-minute macOS LaunchAgent for
   automatic recovery and state-change notifications.
 

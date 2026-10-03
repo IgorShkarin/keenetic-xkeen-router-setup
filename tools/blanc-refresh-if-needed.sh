@@ -9,7 +9,8 @@ AMNEZIA_REFRESH_STAMP="$STATE_DIR/amnezia-last-refresh"
 AMNEZIA_REFRESH_COOLDOWN=1800
 BLANC_REFRESH_ATTEMPT_STAMP="$STATE_DIR/blanc-last-refresh-attempt"
 BLANC_REFRESH_SUCCESS_STAMP="$STATE_DIR/blanc-last-refresh"
-BLANC_REFRESH_RETRY_COOLDOWN=300
+BLANC_REFRESH_RETRY_COOLDOWN=1800
+BLANC_REFRESH_SUCCESS_COOLDOWN=21600
 SSH=(ssh -o BatchMode=yes -o ConnectTimeout=6 "root@$ROUTER")
 
 mkdir -p "$STATE_DIR"
@@ -91,13 +92,41 @@ fi
 # invoke the legacy selector or treat a healthy primary as healthy Blanc.
 if "${SSH[@]}" 'test -x /opt/sbin/home-vpn-auto' >/dev/null 2>&1; then
   check_personal_certificate
-  if "${SSH[@]}" '/opt/sbin/blanc-auto needs-refresh' >/dev/null 2>&1 && \
-      refresh_gate "$BLANC_REFRESH_ATTEMPT_STAMP" "$BLANC_REFRESH_RETRY_COOLDOWN"; then
-    mark_refresh_attempt "$BLANC_REFRESH_ATTEMPT_STAMP"
-    "$SCRIPT_DIR/install-blanc-auto.sh"
-    echo "Reserve pool refreshed; personal VPN routing preserved."
+  reserve_health="$("${SSH[@]}" '/opt/sbin/home-vpn-auto status' 2>/dev/null | sed -n 's/^reserve-blanc=//p')"
+  case "$reserve_health" in
+    healthy)
+      mark_healthy
+      echo "Blanc reserve is healthy; no subscription refresh needed."
+      exit 0
+      ;;
+    unavailable) ;;
+    *)
+      mark_failure warning "Не удалось прочитать здоровье резерва Blanc; обновление не запускалось."
+      echo "Blanc reserve status unavailable; no subscription refresh attempted." >&2
+      exit 1
+      ;;
+  esac
+
+  if ! refresh_gate "$BLANC_REFRESH_SUCCESS_STAMP" "$BLANC_REFRESH_SUCCESS_COOLDOWN"; then
+    mark_failure degraded "Резерв Blanc недоступен; свежая подписка уже проверялась, работает резервный маршрут."
+    echo "Blanc reserve is unavailable, but a verified refresh is still within its cooldown."
+    exit 0
+  fi
+  if ! refresh_gate "$BLANC_REFRESH_ATTEMPT_STAMP" "$BLANC_REFRESH_RETRY_COOLDOWN"; then
+    mark_failure degraded "Резерв Blanc недоступен; действует пауза перед повторным обновлением."
+    echo "Blanc refresh retry cooldown is active."
+    exit 0
+  fi
+
+  mark_refresh_attempt "$BLANC_REFRESH_ATTEMPT_STAMP"
+  if "$SCRIPT_DIR/install-blanc-auto.sh"; then
+    date +%s > "$BLANC_REFRESH_SUCCESS_STAMP"
+    mark_healthy
+    echo "Blanc reserve refreshed and verified; personal VPN routing preserved."
   else
-    echo "Personal VPN manager owns routing; no legacy failover attempted."
+    mark_failure degraded "Blanc не прошёл проверку после обновления; основной и текущий резервный маршруты сохранены."
+    echo "Blanc reserve refresh did not pass live verification; existing routes were preserved." >&2
+    exit 1
   fi
   exit 0
 fi

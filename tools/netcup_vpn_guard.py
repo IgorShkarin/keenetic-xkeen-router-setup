@@ -139,10 +139,16 @@ def save(state):
     events.chmod(0o600)
 
 
-def valid_configuration(settings):
-    commands = [['/usr/local/bin/xray', 'run', '-test', '-config', settings['xray_config']],
-                ['/usr/sbin/nginx', '-t']]
-    return all(run(c).returncode == 0 for c in commands)
+def valid_xray_configuration(settings):
+    # Keep all transport/routing fields, but avoid touching production log files
+    # from the restricted guard. The original configuration is never modified.
+    source = json.loads(Path(settings['xray_config']).read_text())
+    source['log'] = {'loglevel': 'none'}
+    with tempfile.TemporaryDirectory(prefix='validate-', dir=RUNTIME_DIR) as directory:
+        path = Path(directory) / 'config.json'
+        path.write_text(json.dumps(source))
+        path.chmod(0o600)
+        return run(['/usr/local/bin/xray', 'run', '-test', '-config', str(path)]).returncode == 0
 
 
 def check():
@@ -182,7 +188,7 @@ def check():
                 state = decision(previous, observation, time.time())
                 action = state['action']
                 if action in ['nginx', 'xray']:
-                    if not valid_configuration(settings):
+                    if action == 'xray' and not valid_xray_configuration(settings):
                         state['action'] = 'configuration_invalid_no_restart'
                     elif any(requests('127.0.0.1:' + str(port)).values()):
                         state.update(action='recovered_before_restart', health='degraded', failures=0, first_failure=0)
@@ -190,7 +196,10 @@ def check():
                         # Record the cooldown before attempting a recovery, even if it fails.
                         state.update(last_recovery=time.time(), recovery_count=previous.get('recovery_count', 0) + 1)
                         save(state)
-                        result = run(['systemctl', 'try-restart', action + '.service'], timeout=20)
+                        # nginx validates its own configuration during native reload;
+                        # a failed reload preserves the running master and workers.
+                        operation = 'reload' if action == 'nginx' else 'try-restart'
+                        result = run(['systemctl', operation, action + '.service'], timeout=20)
                         post = requests('127.0.0.1:' + str(port))
                         state['post_recovery'] = post
                         if result.returncode == 0 and any(post.values()):

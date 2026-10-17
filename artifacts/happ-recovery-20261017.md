@@ -4,8 +4,9 @@ Status: **application access restored on the iPhone**. After reinstalling Happ
 and receiving the new profile again, the owner reports that ChatGPT loaded in
 Chrome and later confirms YouTube videos play. The earlier basement failure does
 not establish its cause. Long-term stability is not proven by those observations.
-Fresh authenticated Reality/443 traffic is present. Hourly external observation
-is active; the proposed minute-by-minute server guard is not installed.
+Fresh authenticated Reality/443 traffic is present. The minute server guard and
+hourly external/status observation are active. The chosen setup is one Netcup
+with a German exit, independent of the old VPS.
 The active server is the new Netcup VPS. The older AlexHost reachability incident
 is separate. The current server address and continuation details belong in the
 shared `PROJECT_STATE/vpn.md`, not this public repository.
@@ -68,16 +69,18 @@ At 19:26 Moscow, the services still had no automatic restarts. Approximately
 At the owner's request, the hourly thread automation `vpn-netcup` was created,
 then its ACTIVE status, hourly interval and thread attachment were verified.
 It invokes `tools/check-netcup-vpn.py` with ignored local configuration. The
-current check verifies external HTTPS with normal certificate validation.
-Its JSON explicitly reports `healthy: null` and limits scope to HTTPS availability;
-that is not a VLESS authentication or remote phone measurement. Its first live
-check passed. Local scheduled checks require the computer and app to remain on.
+current check retrieves the minute guard's fresh status through a restricted key
+and verifies external HTTPS with normal certificate validation. It reports
+`healthy: true`; this is server-path evidence, not a remote phone measurement.
+Local hourly runs require the Mac and app, while the server guard runs independently.
 
-A bounded server guard has been prepared with 13 passing safety tests. Its
-deployment, automatic recovery and restricted status SSH key await explicit
-owner authorization. It is not running on the VPS. See
-[NETCUP_VPN_GUARD.md](../NETCUP_VPN_GUARD.md) for the implemented observation
-and proposed recovery boundaries.
+The owner authorized the bounded server guard and status-only key. Both are
+installed and verified. At 20:21 Moscow, all 13 checks over approximately 11 minutes
+were healthy, the timer was enabled/active, recovery count was zero and production
+PIDs and automatic restart counts were unchanged. Thirteen safety tests and the
+live isolated recovery test passed. The installed source hashes match the worktree;
+the guard's capability bounding set remains empty. See
+[NETCUP_VPN_GUARD.md](../NETCUP_VPN_GUARD.md) for its scope and rollback.
 
 The active exit geolocates to Germany, and YouTube's anonymous page reports DE.
 The previous VPS geolocates to the Netherlands, but its YouTube page reports RU.
@@ -86,8 +89,11 @@ Direct home access to that VPS still timed out, while access from the new VPS
 worked. An isolated VLESS client on the new VPS through the previous server
 passed Google, YouTube and Cloudflare HTTP 204 checks and a 10 MB download in
 1.20 seconds. Its YouTube page also reported RU. Production PIDs and routes were
-unchanged. A chained exit remains an optional candidate, pending the owner's
-choice; its extra dependency has not been proven on the phone.
+unchanged. The owner subsequently rejected a two-server dependency because of
+cost and expects the old VPS to be switched off in about two weeks. The chain was
+not deployed. All three new VPS VPN configurations have direct/block outbounds
+and no old-server address reference. The hourly observation prompt now specifies
+one Netcup with its German exit. No provider billing or renewal setting was changed.
 
 ## Deployed changes
 
@@ -157,8 +163,8 @@ connection credentials are not copied into this repository.
 
 ## Continuation
 
-1. The owner has confirmed working video. Keep monitoring within the actual scope;
-   await authorization for the server guard and the choice of exit country.
+1. Application access and the guard are verified. Continue the installed
+   observation within its scope, keeping the one-server Netcup setup.
 2. If failure recurs with adequate signal, collect its exact Moscow time and
    fresh Happ log/settings before changing the server. Correlate `home-vpn-443`
    events; server logs use Europe/Berlin, one hour behind Moscow on this date.

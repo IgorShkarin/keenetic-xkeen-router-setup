@@ -9,7 +9,14 @@ Practical backup and notes for running XKeen + Xray on a Keenetic / Netcraze rou
 
 The setup was tested on **Netcraze / Keenetic Hopper NC-3811** with KeeneticOS 5.x, Entware, XKeen 2.0 Stable, and Xray 26.6.27.
 
-## Latest update — 2026-10-02
+## Latest update — 2026-10-17
+
+For continuing the current Netcup, Happ/iPhone and router work, start with
+[CONTINUE.md](CONTINUE.md). It records the verified recovery, the migrated H1
+reserve, active monitoring, the accepted support-form request and the next step.
+Private infrastructure and contact references stay in the shared project state.
+
+## Previous update — 2026-10-02
 
 Added explicit priority recovery: personal XHTTP H2, personal HTTPS H1,
 Blanc, then AmneziaWG. Only verified routes are selected; healthy connections

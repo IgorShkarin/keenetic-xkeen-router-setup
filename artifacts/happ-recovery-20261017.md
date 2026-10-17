@@ -108,7 +108,14 @@ location cannot be changed: a new order and manual data migration are required.
 At the owner's explicit request, a support inquiry was sent and verified in Sent
 asking about either a refund or an Amsterdam replacement with payment credit and
 self-managed migration. It requests keeping the present server running pending
-agreement. No refund, replacement, new order or cancellation is confirmed.
+agreement. A subsequent provider auto-reply said this email channel no longer
+accepts support requests, so the sent email was not an accepted support ticket.
+The same authorized inquiry was then submitted through the official support
+form under Contract / Other, using the registered customer details. The page
+explicitly confirmed that a ticket was created and that its number would follow
+by email. A screenshot of that confirmation is retained privately. No ticket
+number was available at the final mailbox check. No refund, replacement, new
+order or cancellation is confirmed. Do not submit a duplicate inquiry.
 
 Sources: [Netcup VPS FAQ](https://www.netcup.com/en/server/vps) and
 [locations](https://www.netcup.com/en/about-netcup/server-locations).

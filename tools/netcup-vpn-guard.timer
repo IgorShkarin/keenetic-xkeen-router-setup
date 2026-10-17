@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Reality 443 once a minute
+
+[Timer]
+OnBootSec=45s
+OnUnitInactiveSec=60s
+AccuracySec=1s
+Unit=netcup-vpn-guard.service
+
+[Install]
+WantedBy=timers.target

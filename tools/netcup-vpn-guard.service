@@ -1,0 +1,31 @@
+[Unit]
+Description=Bounded Reality 443 health check and recovery
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=!/etc/netcup-vpn-guard/maintenance
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/netcup-vpn-guard.py
+TimeoutStartSec=75s
+UMask=0077
+StateDirectory=netcup-vpn-guard
+StateDirectoryMode=0700
+RuntimeDirectory=netcup-vpn-guard
+RuntimeDirectoryMode=0700
+MemoryMax=150M
+TasksMax=64
+Nice=10
+CPUQuota=20%
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ReadWritePaths=/var/log/nginx /var/log/xray
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=

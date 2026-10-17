@@ -1,10 +1,11 @@
 # Happ/iPhone recovery — 2026-10-17
 
-Status: **partially restored**. After reinstalling Happ and receiving the new
-profile again, the owner reports that ChatGPT loaded in Chrome on the iPhone.
-YouTube still did not load while the owner was in a basement. Signal quality
-may matter, but the cause is unconfirmed. Video playback and sustained phone
-connectivity remain unverified. Fresh authenticated Reality/443 traffic is present.
+Status: **application access restored on the iPhone**. After reinstalling Happ
+and receiving the new profile again, the owner reports that ChatGPT loaded in
+Chrome and later confirms YouTube videos play. The earlier basement failure does
+not establish its cause. Long-term stability is not proven by those observations.
+Fresh authenticated Reality/443 traffic is present. Hourly external observation
+is active; the proposed minute-by-minute server guard is not installed.
 The active server is the new Netcup VPS. The older AlexHost reachability incident
 is separate. The current server address and continuation details belong in the
 shared `PROJECT_STATE/vpn.md`, not this public repository.
@@ -24,8 +25,8 @@ or another condition. A ping or a VPN icon is not proof of working applications.
 The failure screenshots do not show a switch to port 443. The owner dismissed the recreation dialog and later
 reported accidentally reinstalling Happ. The private Reality/443 import URI was
 delivered again at the owner's request. The later report of a loaded ChatGPT page
-is the first positive application result after reinstall. The owner cannot yet
-perform the requested 3–5-minute video check and will report back later.
+is the first positive application result after reinstall. A subsequent reply
+explicitly confirms videos load, beyond merely opening the YouTube feed.
 
 Additional screenshots, taken at 18:37–18:39 before the later fatal-error dialog,
 provide these narrower facts:
@@ -58,6 +59,35 @@ A follow-up at 19:19:41 Moscow time showed Xray, H1, H2 and nginx active, each w
 NRestarts=0. The same counter reached 269, with its latest record at 19:15:52 Moscow
 time. No kernel OOM event appeared in the checked interval since 18:50 Moscow.
 This is a service-health snapshot, not proof of uninterrupted phone connectivity.
+
+At 19:26 Moscow, the services still had no automatic restarts. Approximately
+3.4 GB RAM and 70.77 GB disk space were free; no resource shortage was observed.
+
+## Ongoing observation and exit-country option
+
+At the owner's request, the hourly thread automation `vpn-netcup` was created,
+then its ACTIVE status, hourly interval and thread attachment were verified.
+It invokes `tools/check-netcup-vpn.py` with ignored local configuration. The
+current check verifies external HTTPS with normal certificate validation.
+Its JSON explicitly reports `healthy: null` and limits scope to HTTPS availability;
+that is not a VLESS authentication or remote phone measurement. Its first live
+check passed. Local scheduled checks require the computer and app to remain on.
+
+A bounded server guard has been prepared with 13 passing safety tests. Its
+deployment, automatic recovery and restricted status SSH key await explicit
+owner authorization. It is not running on the VPS. See
+[NETCUP_VPN_GUARD.md](../NETCUP_VPN_GUARD.md) for the implemented observation
+and proposed recovery boundaries.
+
+The active exit geolocates to Germany, and YouTube's anonymous page reports DE.
+The previous VPS geolocates to the Netherlands, but its YouTube page reports RU.
+This may explain the advertising difference; it does not prove an ad-free result.
+Direct home access to that VPS still timed out, while access from the new VPS
+worked. An isolated VLESS client on the new VPS through the previous server
+passed Google, YouTube and Cloudflare HTTP 204 checks and a 10 MB download in
+1.20 seconds. Its YouTube page also reported RU. Production PIDs and routes were
+unchanged. A chained exit remains an optional candidate, pending the owner's
+choice; its extra dependency has not been proven on the phone.
 
 ## Deployed changes
 
@@ -127,10 +157,9 @@ connection credentials are not copied into this repository.
 
 ## Continuation
 
-1. Await the owner's check after leaving the basement: a real video for 3–5
-   minutes with the delivered Netcup Reality 443 profile. Then verify normal
-   mobile/Wi-Fi switching if available. Keep the current configuration meanwhile.
-2. If failure persists with adequate signal, collect its exact Moscow time and
+1. The owner has confirmed working video. Keep monitoring within the actual scope;
+   await authorization for the server guard and the choice of exit country.
+2. If failure recurs with adequate signal, collect its exact Moscow time and
    fresh Happ log/settings before changing the server. Correlate `home-vpn-443`
    events; server logs use Europe/Berlin, one hour behind Moscow on this date.
 3. If the extension fails again, obtain the Happ/iOS versions and its log or
@@ -157,3 +186,5 @@ or restore unrelated application files.
 - [Xray: socket keepalive](https://xtls.github.io/ru/config/transports/sockopt.html)
 - [nginx: routing ClientHello by SNI](https://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html)
 - [Apple: VPN and network connectivity troubleshooting](https://support.apple.com/ru-ru/102281)
+- [Scheduled tasks: local execution requirements](https://learn.chatgpt.com/docs/automations?surface=app)
+- [YouTube monetized markets and paused advertising in Russia](https://support.google.com/youtube/answer/1342206?hl=ru)

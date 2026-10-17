@@ -26,15 +26,16 @@ A real 10,000,000-byte download through the active router SOCKS path completed
 in 3.908 s. This is a bounded successful transfer, not proof of uninterrupted
 video playback or long-term carrier-path stability.
 
-The router still has a stale **H1 reserve pointing to the old AlexHost**, unlike
+At this diagnostic stage the router had a stale **H1 reserve pointing to the old AlexHost**, unlike
 the independent new-server services. The three retained reserve rounds failed
 both control sites; three additional direct reserve rounds also failed both
 sites with connect timeouts. Its user matches the primary profile but its XHTTP
 path differs, so replacing only an address is not a verified migration. The
-reserve was not changed during this diagnosis. Blanc passed all three retained
+reserve was not changed during this diagnosis; it was migrated in the later
+stage below. Blanc passed all three retained
 rounds; Amnezia passed two of three, with both latest reserve states healthy.
-The manager skips failed reserve candidates. The active Netcup path does not
-depend on AlexHost, but the router reserve inventory is not fully migrated.
+The manager skips failed reserve candidates. The active Netcup path did not
+depend on AlexHost, but at that time the router reserve inventory was not fully migrated.
 
 Router routing remains selective: direct rules exist and the last catch-all
 uses `direct`. These observations do not establish full-home VPN coverage or
@@ -61,6 +62,57 @@ Primary references checked for client guidance:
 [Mux limits](https://xtls.github.io/en/config/outbound.html), and
 [TLS traffic analysis limits](https://www.rfc-editor.org/rfc/rfc8446.html#appendix-E.3).
 Camouflage and encryption do not justify a claim of undetectability or anonymity.
+
+## Router H1 reserve migration — verified 20:53 Moscow
+
+An isolated loopback client using the router's existing H1 path, user and TLS
+validation, with the destination/SNI changed to Netcup, passed two YouTube and
+Cloudflare rounds. Both traces matched Netcup; a 10 MB transfer completed in
+1.846 s. This verified the real H1 path before changing production.
+
+The deployed change affects only the `home-h1-reserve` outbound's address and
+TLS server name, plus the manager's expected-exit function. The live manager had
+an old AlexHost expectation even after the outbound moved; H1 now shares the
+primary's private expected Netcup exit, matching the existing public template.
+Other outbounds, credentials, paths, TLS validation and routing rules were
+preserved. The existing primary remains selected. There is no two-VPS chain.
+
+A complete active-config backup and affected manager-script backup were retained
+privately on the router. The first complete validation attempt lacked the native
+geodata environment and failed before any production change. Validation with
+`XRAY_LOCATION_ASSET` set to the normal asset directory passed. One planned native
+XKeen/Xray restart followed; transient failed readiness probes during startup were
+followed by successful primary and repeated reserve checks. No rollback was needed.
+The immediate PID observation preceded the asynchronous restart; a later check
+confirmed the new production process. This is not uninterrupted service maintenance.
+
+Post-change 10 MB transfers completed through the active H2 path in 11.129 s and
+the H1 reserve in 1.844 s. At 20:53, the native monitor reported the primary and
+H1 reserve healthy, fails=0; Blanc and Amnezia also had healthy stored states.
+The existing nine priority-manager tests passed. The independent Netcup minute
+guard remained healthy, with no new incidents, recoveries or native server restarts.
+This is a verified transport reserve on the same VPS; a Netcup outage or IP block
+can still affect both. Selective direct routing remains in place.
+
+## Client auto-connect and future location review
+
+The supplied On Demand rule form shows action Connect and interface Any. Guidance
+was to keep optional SSID/DNS conditions empty, save the rule and enable the main
+On Demand switch. Actual activation and reconnection on the phone are not yet
+confirmed. Auto-connect does not by itself prove fail-closed behavior.
+
+An ACTIVE one-occurrence thread reminder was created for 17 April 2027 at 10:00
+Moscow to review a Netherlands VPS. Netcup's official locations and product
+configuration include Amsterdam. Its current VPS FAQ says an existing server's
+location cannot be changed: a new order and manual data migration are required.
+At the owner's explicit request, a support inquiry was sent and verified in Sent
+asking about either a refund or an Amsterdam replacement with payment credit and
+self-managed migration. It requests keeping the present server running pending
+agreement. No refund, replacement, new order or cancellation is confirmed.
+
+Sources: [Netcup VPS FAQ](https://www.netcup.com/en/server/vps) and
+[locations](https://www.netcup.com/en/about-netcup/server-locations).
+An exit in the Netherlands does not establish an ad-free YouTube result.
 
 ## Evidence from the iPhone
 
@@ -165,7 +217,8 @@ one Netcup with its German exit. No provider billing or renewal setting was chan
   This is an experimental option; its large-transfer check failed. It is not the
   selected phone recovery path. H1 proxy read/send timeouts are now one hour.
 - Installed only the official Debian `libnginx-mod-stream` package. No other
-  packages were upgraded or removed. Router production configuration was not changed.
+  packages were upgraded or removed. Router production configuration was not changed
+  during that phone-recovery stage; the later H1 migration is documented above.
 
 The two Reality inbounds contain copies of their client lists. Future issuance,
 revocation or key rotation must update both relevant inbounds. The H1 experiment

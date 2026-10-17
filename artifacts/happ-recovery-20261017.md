@@ -1,8 +1,10 @@
 # Happ/iPhone recovery — 2026-10-17
 
-Status: server changes deployed and checked; real application access on the
-iPhone remains **unconfirmed**. Following profile delivery after reinstall,
-fresh authenticated requests to Reality/443 appeared on the server.
+Status: **partially restored**. After reinstalling Happ and receiving the new
+profile again, the owner reports that ChatGPT loaded in Chrome on the iPhone.
+YouTube still did not load while the owner was in a basement. Signal quality
+may matter, but the cause is unconfirmed. Video playback and sustained phone
+connectivity remain unverified. Fresh authenticated Reality/443 traffic is present.
 The active server is the new Netcup VPS. The older AlexHost reachability incident
 is separate. The current server address and continuation details belong in the
 shared `PROJECT_STATE/vpn.md`, not this public repository.
@@ -21,8 +23,9 @@ underlying cause is memory pressure, an app defect, an invalid system VPN entry,
 or another condition. A ping or a VPN icon is not proof of working applications.
 The failure screenshots do not show a switch to port 443. The owner dismissed the recreation dialog and later
 reported accidentally reinstalling Happ. The private Reality/443 import URI was
-delivered again at the owner's request. Its import and real application traffic
-after the reinstall are the current verification gate.
+delivered again at the owner's request. The later report of a loaded ChatGPT page
+is the first positive application result after reinstall. The owner cannot yet
+perform the requested 3–5-minute video check and will report back later.
 
 Additional screenshots, taken at 18:37–18:39 before the later fatal-error dialog,
 provide these narrower facts:
@@ -50,6 +53,11 @@ NRestarts=0, and 260 accepted requests for the existing Happ identity through
 accounted for 24 requests and had already stopped. This proves fresh authenticated
 traffic through the new inbound; it does not prove which physical device sent it
 or that webpages/video finished loading. No configuration was changed in this check.
+
+A follow-up at 19:19:41 Moscow time showed Xray, H1, H2 and nginx active, each with
+NRestarts=0. The same counter reached 269, with its latest record at 19:15:52 Moscow
+time. No kernel OOM event appeared in the checked interval since 18:50 Moscow.
+This is a service-health snapshot, not proof of uninterrupted phone connectivity.
 
 ## Deployed changes
 
@@ -119,20 +127,20 @@ connection credentials are not copied into this repository.
 
 ## Continuation
 
-1. After the reported reinstall, import the delivered URI and allow Happ to add
-   its system VPN configuration. If the fatal error returns, recreate only the
-   Happ VPN entry under iOS Settings > General > VPN & Device Management > VPN;
-   do not remove unrelated management profiles. Reboot if recreation does not help,
-   as the Happ error dialog itself suggests.
-2. Confirm the selected profile is Netcup Reality 443 and actually uses TCP 443. A fresh private
-   Reality/443 import file and QR are stored under ignored
-   `private-backups/happ-20261017/`; the QR was decoded locally and matched the URI.
-3. Check a real webpage and video on mobile data and cafe Wi-Fi. Correlate the
-   exact Moscow time with `home-vpn-443` events. Server logs use Europe/Berlin
-   time; on this date Moscow is one hour ahead.
-4. If the extension fails again, obtain the Happ/iOS versions and its log or
-   iOS crash record around the failure. Do not infer a memory or carrier cause
-   from the generic fatal-error message alone.
+1. Await the owner's check after leaving the basement: a real video for 3–5
+   minutes with the delivered Netcup Reality 443 profile. Then verify normal
+   mobile/Wi-Fi switching if available. Keep the current configuration meanwhile.
+2. If failure persists with adequate signal, collect its exact Moscow time and
+   fresh Happ log/settings before changing the server. Correlate `home-vpn-443`
+   events; server logs use Europe/Berlin, one hour behind Moscow on this date.
+3. If the extension fails again, obtain the Happ/iOS versions and its log or
+   iOS crash record around the failure. Recreate only the Happ VPN entry under
+   iOS Settings > General > VPN & Device Management > VPN; reboot if recreation
+   does not help, as the Happ error dialog suggests. Do not infer a memory or
+   carrier cause from the generic message alone.
+
+The private Reality/443 import file and QR are under ignored
+`private-backups/happ-20261017/`; the QR was decoded locally and matched the URI.
 
 Root-only backups of the successful stages remain on the VPS:
 `/root/vpn-recovery-backups/20261017T154225Z/` and

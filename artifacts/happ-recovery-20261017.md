@@ -1,6 +1,8 @@
 # Happ/iPhone recovery — 2026-10-17
 
-Status: server changes deployed and checked; iPhone internet access is **not restored**.
+Status: server changes deployed and checked; real application access on the
+iPhone remains **unconfirmed**. Following profile delivery after reinstall,
+fresh authenticated requests to Reality/443 appeared on the server.
 The active server is the new Netcup VPS. The older AlexHost reachability incident
 is separate. The current server address and continuation details belong in the
 shared `PROJECT_STATE/vpn.md`, not this public repository.
@@ -17,9 +19,37 @@ TUNNEL configuration.
 This is evidence of a client tunnel failure. It does not establish whether the
 underlying cause is memory pressure, an app defect, an invalid system VPN entry,
 or another condition. A ping or a VPN icon is not proof of working applications.
-The screenshots do not show the profile port, so a switch to 443 on the phone
-has not been confirmed. The owner dismissed the recreation dialog; manual
-recreation of the **Happ VPN entry only** is the current next step.
+The failure screenshots do not show a switch to port 443. The owner dismissed the recreation dialog and later
+reported accidentally reinstalling Happ. The private Reality/443 import URI was
+delivered again at the owner's request. Its import and real application traffic
+after the reinstall are the current verification gate.
+
+Additional screenshots, taken at 18:37–18:39 before the later fatal-error dialog,
+provide these narrower facts:
+
+- The old Netcup-Happ profile still used port 8443, TCP, XTLS Vision, Chrome
+  fingerprint and Reality. The VLESS protocol's `none` security/encryption field
+  coexists with Reality below; it does not show that transport encryption was off.
+- Happ reported app 6.1.0 and Xray core 26.9.9 for that earlier attempt. It logged
+  successful core startup, then TLS handshake/deadline timeouts to the ping test
+  endpoint. Its final stop reason was `userInitiated`; that record is not evidence
+  of a crash or of the later fatal error.
+- The separate tunnel-history screenshot contains entries from October 9–10,
+  with app 6.0.0 and Cloudflare DoH. It does not prove the October 17 DNS settings.
+- Mux, fragmentation and Xray TUN were off; IPv4 was selected. Packet analysis
+  was on. The memory-limit slider was between 40 and 50 MB, with no exact numeric
+  selection displayed. The idle timeout was 300 and the TCP/UDP limits 256/128.
+  A stopped-state RAM reading of 0.0 MB does not establish memory pressure.
+
+The new private URI uses port 443 and Firefox. Client versions and settings after
+the reinstall have not been confirmed; do not assume those earlier settings persist.
+
+At 19:15:39 Moscow time, a fresh read-only SSH check showed Xray active,
+NRestarts=0, and 260 accepted requests for the existing Happ identity through
+`home-vpn-443`, with the latest at that moment. Earlier controlled 443 probes
+accounted for 24 requests and had already stopped. This proves fresh authenticated
+traffic through the new inbound; it does not prove which physical device sent it
+or that webpages/video finished loading. No configuration was changed in this check.
 
 ## Deployed changes
 
@@ -89,11 +119,12 @@ connection credentials are not copied into this repository.
 
 ## Continuation
 
-1. Recreate the Happ system VPN entry, then allow Happ to add it again. Delete
-   only its entry under iOS Settings > General > VPN & Device Management > VPN;
+1. After the reported reinstall, import the delivered URI and allow Happ to add
+   its system VPN configuration. If the fatal error returns, recreate only the
+   Happ VPN entry under iOS Settings > General > VPN & Device Management > VPN;
    do not remove unrelated management profiles. Reboot if recreation does not help,
    as the Happ error dialog itself suggests.
-2. Confirm the selected Netcup profile actually uses TCP 443. A fresh private
+2. Confirm the selected profile is Netcup Reality 443 and actually uses TCP 443. A fresh private
    Reality/443 import file and QR are stored under ignored
    `private-backups/happ-20261017/`; the QR was decoded locally and matched the URI.
 3. Check a real webpage and video on mobile data and cafe Wi-Fi. Correlate the

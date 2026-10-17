@@ -1,0 +1,22 @@
+# Local backends require PROXY protocol and preserve the original source IP.
+stream {
+    map $ssl_preread_server_name $vpn_443_backend {
+        default 127.0.0.1:18443;
+        REPLACE_WITH_REALITY_SNI 127.0.0.1:18448;
+    }
+    server {
+        listen 443 so_keepalive=30s:15s:4;
+        listen [::]:443 so_keepalive=30s:15s:4;
+        ssl_preread on;
+        preread_timeout 30s;
+        preread_buffer_size 32k;
+        proxy_connect_timeout 5s;
+        proxy_timeout 1h;
+        proxy_socket_keepalive on;
+        proxy_protocol on;
+        proxy_next_upstream off;
+        proxy_pass $vpn_443_backend;
+        access_log off;
+        error_log /var/log/nginx/vpn-443-error.log warn;
+    }
+}

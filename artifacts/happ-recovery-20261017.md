@@ -11,6 +11,57 @@ The active server is the new Netcup VPS. The older AlexHost reachability inciden
 is separate. The current server address and continuation details belong in the
 shared `PROJECT_STATE/vpn.md`, not this public repository.
 
+## Router and current client follow-up — 20:32–20:35 Moscow
+
+Read-only checks from the router confirmed the active `vless-reality` tag uses
+Netcup XHTTP stream-up/TLS on the existing H2 listener, with certificate validation
+enabled. Its actual Cloudflare trace exited through Netcup in Germany. The
+router reported `mode=home`, `health=healthy`, `fails=0`; Xray was running and
+approximately 228 MiB RAM was available.
+
+The retained 20:20–20:34 health window contained 15 active-path checks: YouTube
+passed 15/15 (maximum total time 0.841 s), Cloudflare 14/15. A separate series
+passed all three YouTube and all three Cloudflare requests in 0.137–0.187 s.
+A real 10,000,000-byte download through the active router SOCKS path completed
+in 3.908 s. This is a bounded successful transfer, not proof of uninterrupted
+video playback or long-term carrier-path stability.
+
+The router still has a stale **H1 reserve pointing to the old AlexHost**, unlike
+the independent new-server services. The three retained reserve rounds failed
+both control sites; three additional direct reserve rounds also failed both
+sites with connect timeouts. Its user matches the primary profile but its XHTTP
+path differs, so replacing only an address is not a verified migration. The
+reserve was not changed during this diagnosis. Blanc passed all three retained
+rounds; Amnezia passed two of three, with both latest reserve states healthy.
+The manager skips failed reserve candidates. The active Netcup path does not
+depend on AlexHost, but the router reserve inventory is not fully migrated.
+
+Router routing remains selective: direct rules exist and the last catch-all
+uses `direct`. These observations do not establish full-home VPN coverage or
+absence of DNS/IPv6 leaks. Phone routing and On Demand rules were not visible
+in the supplied screenshots and were not measured remotely.
+
+The new iPhone screenshots show the working 443/Reality/Vision/Firefox profile,
+IPv4 preference, Mux/fragmentation/Xray TUN/LAN sharing disabled and empty
+FinalMask input. The VLESS `none` field is distinct from the active Reality
+transport security. Do not enable experimental masks or replace matching keys
+as a generic stability measure. On Demand is the relevant iOS auto-connect
+mechanism, but the current app-specific rules remain unknown.
+
+At 20:32, the independent server checker returned healthy with fresh minute-guard
+status, both proxy controls successful, timer active, no new incidents, no new
+recoveries or native restarts, and valid external HTTPS. This checks the server
+443 path, not the router's H2 path or the remote phone. Production configurations
+and routes were unchanged during this follow-up.
+
+Primary references checked for client guidance:
+[Apple On Demand](https://support.apple.com/guide/deployment/vpn-overview-depae3d361d0/1/web/1.0),
+[Xray REALITY](https://xtls.github.io/en/config/transports/reality.html),
+[VLESS transport security](https://xtls.github.io/en/config/outbounds/vless.html),
+[Mux limits](https://xtls.github.io/en/config/outbound.html), and
+[TLS traffic analysis limits](https://www.rfc-editor.org/rfc/rfc8446.html#appendix-E.3).
+Camouflage and encryption do not justify a claim of undetectability or anonymity.
+
 ## Evidence from the iPhone
 
 The owner reports failure on mobile data and a cafe Wi-Fi network; the cafe network

@@ -42,7 +42,7 @@
   "profile_sha256": "934cddac57c784bd8266f3f061d1556b1918509c4ab2c11f7902299c1bc572bc",
   "uri_round_trip": "pass",
   "precedence_checks": "proxy domain before RU GeoIP: pass",
-  "phone_import": "not performed",
+  "phone_import": "confirmed by owner screenshots, 2026-10-18 22:06 Moscow",
   "live_traffic_verification": "not performed",
   "vpn_warning_disappearance": "not verified",
   "cases": [
@@ -743,5 +743,27 @@
       "2": 353
     },
     "scope": "all literal bank domain rules in the downloaded GeoSite category; no real device traffic observed"
+  },
+  "phone_import_evidence": {
+    "profile_name": "RU direct 2026-10-18",
+    "profile_visible_in_routing_list": true,
+    "geosite_displayed_mb": 10.7,
+    "geoip_displayed_mb": 15.82,
+    "geofiles_last_updated_displayed": "18.10.2026 22:06",
+    "use_chunk_files": true,
+    "fake_dns": false,
+    "domain_strategy": "IPIfNonMatch",
+    "remote_dns": {
+      "type": "DoH",
+      "url": "https://cloudflare-dns.com/dns-query",
+      "ip": "1.1.1.1"
+    },
+    "domestic_dns": {
+      "type": "DoU",
+      "ip": "77.88.8.8"
+    },
+    "phone_geofile_hashes_checked": false,
+    "routing_enabled_for_live_connections": "not confirmed",
+    "apps_with_vpn_after_import": "not yet verified"
   }
 }

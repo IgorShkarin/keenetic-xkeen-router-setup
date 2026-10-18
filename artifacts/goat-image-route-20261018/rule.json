@@ -1,0 +1,14 @@
+{
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ruleTag": "goat-image-vpn-20261018",
+        "inboundTag": ["redirect", "tproxy", "codex-test-socks"],
+        "network": "tcp",
+        "domain": ["domain:image.goat.com"],
+        "balancerTag": "home-priority"
+      }
+    ]
+  }
+}

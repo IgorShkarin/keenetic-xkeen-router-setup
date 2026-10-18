@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-18",
+  "symptom": "GOAT Wants prices visible, product pictures absent on home Wi-Fi; Happ off",
+  "observed_client_route_before": "image.goat.com via direct at 21:38:59 Moscow",
+  "control_image_source": "https://www.goat.com/sneakers/air-jordan-9-retro-og-space-jam-2026-hv4794-106",
+  "control_image_url": "https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/118/348/778/original/1708808_01.jpg.jpeg?action=crop&width=750",
+  "complete_image_bytes": 37191,
+  "complete_image_sha256": "e688583b6fd287ceb2e17ff12c60a92464600910d4cf0467eb44ecb086356383",
+  "direct_before": [
+    {"http": 200, "bytes": 16384, "seconds": 15.002491, "curl_exit": 28},
+    {"http": 200, "bytes": 15847, "seconds": 15.002865, "curl_exit": 28}
+  ],
+  "forced_vpn_control_before": [
+    {"http": 200, "bytes": 37191, "seconds": 0.172204},
+    {"http": 200, "bytes": 37191, "seconds": 0.170548}
+  ],
+  "configured_routing_after": {
+    "diagnostic_inbound": "codex-test-socks",
+    "socks_port": 10808,
+    "rule_tag": "goat-image-vpn-20261018",
+    "network": "tcp",
+    "domain": "image.goat.com",
+    "balancer": "home-priority",
+    "observed_outbound": "vless-reality",
+    "downloads": [
+      {"http": 200, "type": "image/jpeg", "bytes": 37191, "seconds": 0.239732, "sha256_matches": true},
+      {"http": 200, "type": "image/jpeg", "bytes": 37191, "seconds": 0.310131, "sha256_matches": true}
+    ]
+  },
+  "checks": {
+    "exact_backup_copies_sha256_match": true,
+    "only_one_rule_added_semantically": true,
+    "full_candidate_configuration": "Configuration OK",
+    "full_active_configuration": "Configuration OK",
+    "api_rule_count_before": 26,
+    "api_rule_count_after": 27,
+    "balancer_selection_preserved": true,
+    "xray_pid_unchanged": true,
+    "xray_restart_performed": false
+  },
+  "real_iphone_picture_rendering": "awaiting owner verification",
+  "happ_russian_routing_profile": "separate task; latest phone screen has no routing profiles, Server-List offered as import destination; selection and import not confirmed"
+}

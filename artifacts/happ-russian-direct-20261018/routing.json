@@ -1,0 +1,40 @@
+{
+  "Name": "RU direct 2026-10-18",
+  "GlobalProxy": "true",
+  "RouteOrder": "proxy-direct-block",
+  "RemoteDNSType": "DoH",
+  "RemoteDNSDomain": "https://cloudflare-dns.com/dns-query",
+  "RemoteDNSIP": "1.1.1.1",
+  "DomesticDNSType": "DoU",
+  "DomesticDNSIP": "77.88.8.8",
+  "DirectSites": [
+    "geosite:category-ru",
+    "geosite:category-bank-ru",
+    "domain:ozon.ru",
+    "domain:ozone.ru",
+    "domain:ozon.com",
+    "domain:ozonusercontent.com",
+    "domain:kinopoisk.ru",
+    "domain:polyclinika.ru",
+    "domain:zub.ru"
+  ],
+  "DirectIp": [
+    "geoip:ru",
+    "geoip:private"
+  ],
+  "ProxySites": [
+    "geosite:google",
+    "geosite:youtube",
+    "geosite:openai",
+    "geosite:anthropic",
+    "geosite:telegram",
+    "geosite:meta",
+    "geosite:discord",
+    "geosite:github",
+    "geosite:rutracker"
+  ],
+  "ProxyIp": ["geoip:telegram"],
+  "DomainStrategy": "IPIfNonMatch",
+  "FakeDNS": "false",
+  "UseChunkFiles": "true"
+}

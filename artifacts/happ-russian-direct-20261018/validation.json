@@ -1,0 +1,747 @@
+{
+  "checked_at_utc": "2026-10-18T17:08:12.779503+00:00",
+  "status": "pass",
+  "domain_cases": 110,
+  "ip_cases": 4,
+  "geosite_codes": {
+    "anthropic": 9,
+    "category-bank-ru": 356,
+    "category-ru": 1125,
+    "discord": 28,
+    "github": 65,
+    "google": 1077,
+    "meta": 555,
+    "openai": 24,
+    "rutracker": 9,
+    "telegram": 21,
+    "youtube": 178
+  },
+  "geoip_codes": {
+    "private": 18,
+    "ru": 25194,
+    "telegram": 12
+  },
+  "geosite_source": {
+    "repository": "https://github.com/Loyalsoldier/v2ray-rules-dat",
+    "release_commit": "a526f4f7fef9b334ab4ad202b84d519d82dcc13d",
+    "commit_date": "2026-10-17T22:06:53Z",
+    "sha256": "15272a5503020d67199bec2e5b1c26b8de98ed0c9fe65d390a5ecd66acf1b430",
+    "bytes": 11214628
+  },
+  "geoip_source": {
+    "release_commit": "a526f4f7fef9b334ab4ad202b84d519d82dcc13d",
+    "sha256": "010bfc2e353c5e34e23156004944444ca260bae999e73171bdd7974056557959",
+    "bytes": 16587403
+  },
+  "upstream_lists_source": {
+    "commit": "6b0f8edc935ee0ad2cb386ac3efd451ee2380ac5",
+    "commit_date": "2026-10-18T12:37:38Z",
+    "repository": "https://github.com/v2fly/domain-list-community",
+    "files": 1547
+  },
+  "profile_sha256": "934cddac57c784bd8266f3f061d1556b1918509c4ab2c11f7902299c1bc572bc",
+  "uri_round_trip": "pass",
+  "precedence_checks": "proxy domain before RU GeoIP: pass",
+  "phone_import": "not performed",
+  "live_traffic_verification": "not performed",
+  "vpn_warning_disappearance": "not verified",
+  "cases": [
+    {
+      "host": "ozon.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "cdn2.ozone.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "ozon.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "ozonusercontent.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "wildberries.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "wb.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "wbbasket.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "wbstatic.net",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "avito.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "avito.st",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "cian.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "youla.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "lemanapro.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "lmcdn.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "cdek.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "pochta.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "yandex.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "yastatic.net",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "vk.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "vkvideo.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "ok.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "mail.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "2gis.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "2gis.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "kinopoisk.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "ivi.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "ivicdn.tv",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "okko.tv",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "wink.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "rutube.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "start.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "polyclinika.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "zub.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "emias.info",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "medsi.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "apteka.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "sberbank.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "online.sberbank.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "sber.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "tbank.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "tinkoff.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "alfabank.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "alfa.me",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "raiffeisen.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "vtb.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "vtb.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "tochka.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "gazprombank.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "gazprombank.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "mtsbank.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "psb.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "rshb.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "uralsib.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "bspb.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "moex.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "finuslugi.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "nspk.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "best2pay.net",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "koronapay.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "gosuslugi.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "nalog.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "mos.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "rzd.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "tutu.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "aviasales.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "ostrovok.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "citydrive.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "taxi.yandex.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "rosneft.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "5ka.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "vkusvill.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "magnit.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "magnit.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "kuper.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "sbermarket.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "lenta.com",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "dodopizza.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "dodostatic.net",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "dns-shop.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "mvideo.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "eldorado.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "detmir.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "beeline.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "mts.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "megafon.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "t2.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "rt.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "dom.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "kontur.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "hh.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "aliexpress.ru",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "host": "youtube.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "googlevideo.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "google.ru",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "gmail.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "chatgpt.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "openai.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "claude.ai",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "telegram.org",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "t.me",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "instagram.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "facebook.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "whatsapp.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "discord.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "github.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "rutracker.org",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "bybit.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "okx.com",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "example.invalid",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "host": "ozon.ru.example.invalid",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "ip": "192.168.1.1",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "ip": "10.1.2.3",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true
+    },
+    {
+      "ip": "1.1.1.1",
+      "expected": "proxy",
+      "result": "proxy",
+      "pass": true
+    },
+    {
+      "ip": "2.16.20.1",
+      "expected": "direct",
+      "result": "direct",
+      "pass": true,
+      "fixture": "address from the downloaded RU GeoIP range, not a live service probe"
+    }
+  ],
+  "qr_round_trip": "pass",
+  "bank_domain_audit": {
+    "status": "pass",
+    "checked": 356,
+    "skipped": [],
+    "failures": [],
+    "rule_types": {
+      "3": 3,
+      "2": 353
+    },
+    "scope": "all literal bank domain rules in the downloaded GeoSite category; no real device traffic observed"
+  }
+}
